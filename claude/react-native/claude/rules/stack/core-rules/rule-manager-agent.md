@@ -36,8 +36,7 @@ Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes
 - Before creating a rule, check if an existing rule already covers the pattern
 - Keep rules concise — no redundancy between rule files
 - Always use English in rule content
-- After creating or updating a rule, **also update the Domain rules table in `CLAUDE.md`** (path glob + one-line description)
-- After any creation or update, confirm: `✅ .claude/rules/{path}/{file}.md created/updated (+ CLAUDE.md index)`
+- After any creation or update, confirm: `✅ .claude/rules/{path}/{file}.md created/updated`
 
 ## Rule size guardrails
 - Keep each `.md` file under ~250 lines when possible
@@ -46,7 +45,7 @@ Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes
 
 ## Attachment model (Claude Code)
 - **Always-on:** only true repo-wide maps (architecture, naming, no-unrequested-cleanup). Add them to `CLAUDE.md` via `@`-import, and leave their `globs:` line empty so the hook does not double-inject them.
-- **Scoped:** everything else. Give the rule a keyword-rich `description` (topics, folder names, symbols like `DsIcon`, `DsModal`) and a tight `globs:` line (smallest subtree that needs it, unquoted, comma-separated). The `PreToolUse` hook `.claude/hooks/inject-rules.mjs` reads `globs:` and injects the rule before an `Edit`/`Write` to a matching file (once per session). Also add one row to the `CLAUDE.md` Domain rules table (reference + fallback when hooks are off). The user can `@`-mention it explicitly.
+- **Scoped:** everything else. Give the rule a keyword-rich `description` (topics, folder names, symbols like `DsIcon`, `DsModal`) and a tight `globs:` line (smallest subtree that needs it, unquoted, comma-separated). The `PreToolUse` hook `.claude/hooks/inject-rules.mjs` reads `globs:` and injects the rule before an `Edit`/`Write` to a matching file (once per session). `globs:` is the only rule index — `CLAUDE.md` does not list scoped rules. The user can `@`-mention it explicitly.
 - **`globs:` is load-bearing** — an inaccurate or missing glob means the rule never fires. After renaming/moving folders, re-check every `globs:`.
 - **Overlap** between globs is fine when it keeps a rule discoverable; avoid duplicating the *same* guidance across two files.
 - **This repo has no `src/`** — use root folders (`screens/`, `components/`, `navigation/`, …).

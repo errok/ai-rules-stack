@@ -35,12 +35,11 @@ Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes
 - After changing architecture (router path, API version, DB model folder), **verify paths against the repo** — stale paths break agent guidance
 - Keep each `.md` file under ~250 lines — split if needed
 - Never add content to `project-architecture-always` unless it's truly global
-- After creating or updating a rule, **also update the Domain rules table in `CLAUDE.md`** (path glob + one-line description)
-- After any creation or update: `✅ .claude/rules/{path}/{file}.md created/updated (+ CLAUDE.md index)`
+- After any creation or update: `✅ .claude/rules/{path}/{file}.md created/updated`
 - All authored content under `.claude/` must be **English** (chat summaries to the user may use French if the team prefers)
 
 ## Attachment model (Claude Code)
-- **`globs:` frontmatter** — unquoted, comma-separated line (`globs: database/model/**/*.go`). The `PreToolUse` hook `.claude/hooks/inject-rules.mjs` reads it and injects the rule before an `Edit`/`Write` to a matching file (once per session; re-injected after a context compaction). It also feeds the `CLAUDE.md` table and `@`-mentions.
+- **`globs:` frontmatter** — unquoted, comma-separated line (`globs: database/model/**/*.go`). The `PreToolUse` hook `.claude/hooks/inject-rules.mjs` reads it and injects the rule before an `Edit`/`Write` to a matching file (once per session; re-injected after a context compaction). It is the only rule index — `CLAUDE.md` does not list scoped rules.
 - **`globs:` is load-bearing** — an inaccurate or missing glob means the rule never fires. After changing folders/paths, re-check every `globs:`.
 - **Always-on rules** (e.g. `project-architecture-always.md`, `no-go-test-auto.md`) are `@`-imported by `CLAUDE.md`; leave their `globs:` line empty so the hook does not double-inject them.
 - **Tight globs** — the smallest path that needs the rule (`application/**/*.go`, `services/**/client.go`), not `**/*.go` unless truly universal.

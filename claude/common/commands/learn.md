@@ -92,9 +92,9 @@ When creating or updating `.claude/rules/**/*.md` YAML frontmatter:
 
 For each pattern:
 
-- coding convention → create / update a rule under `.claude/rules/`, then add or
-  update its row in the **Domain rules** table of `CLAUDE.md` (always-on rules are
-  `@`-imported by `CLAUDE.md` instead — see `core-rules/rule-manager-agent.md`)
+- coding convention → create / update a rule under `.claude/rules/` with an accurate
+  `globs:` line (always-on rules are `@`-imported by `CLAUDE.md` instead — see
+  `core-rules/rule-manager-agent.md`)
 - repeatable multi-step procedure → skill under `.claude/skills/`
 - workflow → command under `.claude/commands/`
 
