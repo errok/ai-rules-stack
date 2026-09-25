@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" || exit 0; [ -e .claude/rules/stack/STACK.md ] && exit 0; if git submodule update --init --recursive >&2; then echo 'Stack rules were missing: the .ai-rules-stack submodule was just initialized. Always-on stack rules follow.'; cat .claude/rules/stack/STACK.md; grep '^@' .claude/rules/stack/STACK.md | cut -c2- | while read -r f; do cat \"$f\"; done; else echo 'Stack rules unavailable: git submodule update --init failed (no access to ai-rules-stack?). Rules under .claude/rules/stack will not apply.'; fi; exit 0"
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" || exit 0; [ -e .claude/rules/stack/STACK.md ] && exit 0; if git submodule update --init --recursive >&2; then echo 'Stack rules were missing: the ai-rules-stack submodule was just initialized. Always-on stack rules follow.'; cat .claude/rules/stack/STACK.md; grep '^@' .claude/rules/stack/STACK.md | cut -c2- | while read -r f; do cat \"$f\"; done; else echo 'Stack rules unavailable: git submodule update --init failed (no access to ai-rules-stack?). Rules under .claude/rules/stack will not apply.'; fi; exit 0"
           }
         ]
       }
