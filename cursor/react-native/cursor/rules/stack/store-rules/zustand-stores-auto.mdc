@@ -1,0 +1,58 @@
+---
+description: Zustand stores/ — create(), T{Name}Store, MMKV persist mmkvStorage, partialize; no HTTP in stores; Supabase session not in Zustand.
+globs: stores/**
+alwaysApply: false
+---
+
+# Zustand Stores — Conventions
+
+## No HTTP / services in stores (mandatory)
+
+- **Never** import from `services/**` (or call `r` / `fetch`) inside `stores/**`.
+- **Never** add async store actions that fetch and fill state (`fetchScore`, `loadUser`, etc.) — that is **hook** (or screen) responsibility.
+
+```tsx
+// ❌ BAD — HTTP inside the store
+fetchData: async () => {
+  const response = await getSomething();
+  set({ value: response.field });
+},
+
+// ✅ GOOD — store: state + setters only
+setValue: (value) => set({ value }),
+
+// ✅ GOOD — hook or screen: service then setters
+const response = await getSomething();
+useMyStore.getState().setValue(response.field ?? null);
+```
+
+## Structure
+- One file per domain: `useUserStore.ts`, `useThemeStore.ts`
+- State + setters in the same file using `create()` — no slices pattern
+- Actions are inline setter functions passed to `set`
+
+## When to persist vs in-memory
+- **Persist (MMKV + `persist`)** for domain caches that must survive app kill (e.g. theme preference, app config cache).
+- **In-memory only** for data that is always refetched right after auth (e.g. `useUserStore` / `me`): avoids stale profile and duplicate storage; **Supabase session** lives in MMKV via the auth provider, not in Zustand.
+
+## MMKV adapter for Zustand `persist`
+- Never bypass `stores/storage/mmkvStorage.ts`: `getItem` must **`JSON.parse`** the string read from MMKV because `setItem` stores JSON. Returning a raw string breaks rehydration.
+- Each persistent store uses its own MMKV id: `createMMKV({ id: 'theme-store-mmkv' })`.
+- Type the storage with the **persisted slice** only: `createMMKVStorage<PersistedSlice>(mmkv)`.
+
+## `partialize` and typed persisted state
+- Use `partialize` to persist **only** serializable data fields — exclude runtime flags like `hasHydrated` and all functions.
+- Mirror that slice in a type with `Pick<>` for `createMMKVStorage` and for clarity.
+
+## Logout / reset global
+- When adding or renaming a store that holds user-scoped state, **always** add a corresponding clear/reset call in `stores/utils/clearStores.ts` so logout clears all relevant stores consistently.
+
+## Naming
+- Store state type: prefix **`T`** — `TUserStore`, `TThemeStore`
+- Enums used in stores: prefix **`E`**
+- Store hook: `use{Domain}Store`
+- File: `camelCase.ts` (`useUserStore.ts`, `useThemeStore.ts`)
+
+## Boolean UI flags (visibility, expanded, etc.)
+- Prefer **explicit intent** actions: `showMenu()` / `hideMenu()` (and optionally `toggleMenu()`).
+- Avoid generic setters like `setMenuVisible(boolean)` — unclear at call sites and easy to misuse.

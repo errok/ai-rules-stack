@@ -1,0 +1,20 @@
+---
+description: assets SVG icons — root svg color fallback black, stroke fill currentColor, tint from RN color prop; avoid duplicate white/black glyphs.
+globs: assets/**/*.svg
+alwaysApply: false
+---
+
+# SVG assets
+
+## Goal
+Icons should be **tintable** from React Native SVG (`color` prop) while defaulting to **black** when no color is passed.
+
+## Rules
+- On the root `<svg>` element: set `color="#000000"` (fallback when the parent does not set `color`).
+- Replace hard-coded paint on shapes:
+  - strokes: `stroke="currentColor"` (avoid `stroke="white"` / fixed hex unless product requires it)
+  - fills: `fill="currentColor"` (same idea)
+- Do not maintain separate “white” / “black” variants of the same glyph if `currentColor` is enough.
+
+## Usage from code
+Pass the tint via the generated component’s `color` prop (e.g. `color="#..."` or a resolved design token). Prefer `DsIcon` when the icon is in the registry.

@@ -1,0 +1,42 @@
+---
+description: Apply when the user asks to create, update or delete a Cursor rule, skill, command, or hook. Also apply when the user says "remember this", "always do X", "never do Y", or when a recurring pattern is identified that should be codified into .cursor/.
+globs:
+alwaysApply: false
+---
+
+# Rule Manager
+
+## File locations
+| Type | Location | Naming pattern |
+|---|---|---|
+| Always rule | `.cursor/rules/core-rules/` | `*-always.mdc` |
+| Auto-attached rule | `.cursor/rules/{category}/` | `*-auto.mdc` |
+| Agent-requested rule | `.cursor/rules/{category}/` | `*-agent.mdc` |
+| Manual rule | `.cursor/rules/{category}/` | `*-manual.mdc` |
+| Skill | `.cursor/skills/{name}/SKILL.md` | — |
+| Command | `.cursor/commands/{name}.md` | — |
+
+## Categories
+- `core-rules/` — agent behavior, architecture, global contracts
+- `ts-rules/` — TypeScript, typing conventions
+- `component-rules/` — components and screens structure
+- `service-rules/` — HTTP services layer
+- `store-rules/` — Zustand stores and MMKV
+
+## Rules
+- Before creating a rule, check if an existing rule already covers the pattern
+- Keep rules concise — no redundancy between rule files
+- Always use English in rule content
+- After any creation or update, confirm: `✅ .cursor/rules/{path}/{file}.mdc created/updated`
+
+## Rule size guardrails
+- Keep each .mdc file under ~250 lines when possible
+- If a rule grows too large or mixes concerns, proactively propose splitting it into multiple focused rules
+- Prefer adding new rule files over extending the alwaysApply rule
+
+## Globs vs descriptions (attachment)
+- **Auto-attached:** rules with `globs` that match the active file load automatically. Overly broad globs (e.g. `**/*.tsx` for every TSX file) inflate context on every screen edit.
+- **Prefer:** tight globs for **folder-specific** rules (`navigation/**`, `services/auth/**`, modal file paths). For **cross-cutting** conventions (icons, callbacks), scope globs to `components/**` when the same policy also holds for screens — rely on the **`description`** field so the agent can still pull the rule when editing `screens/**` or when the user @-mentions the topic.
+- **Descriptions:** Write keyword-rich one-liners (topics, folder names, symbols like `DsIcon`, `DsModal`) so agent-requested retrieval stays useful when globs are narrow.
+- **Screens:** Keep `component-screen-structure` (and similar) on `screens/**` where structure and navigation typing are screen-centric; avoid duplicating the same glob on every UI rule.
+- **This repo has no `src/`** — use root folders (`screens/`, `components/`, `navigation/`, …).

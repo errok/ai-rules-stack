@@ -1,0 +1,58 @@
+---
+description: Go module at repo root; Model Service Controller; gin router middleware infrastructure auth Supabase; flat layout — always-on map for the backend.
+globs:
+alwaysApply: true
+---
+
+# Project — Go Backend Architecture
+
+## Module root
+- Go module at **repo root** (`go.mod`, `main.go` at the top level — no `app/` wrapper folder)
+- All paths below are relative to the **repo root**
+
+## Stack
+- gin-gonic, PostgreSQL via GORM
+- **Auth:** bearer **JWT** validated in **middleware**; provider-specific logic in **`infrastructure/auth`** (pluggable adapter surface). Default implementation: **Supabase** (JWKS ES256).
+- Config via **Viper** + env vars (`config/`)
+- Prefer modern Go patterns; format with gofmt; use gosimple / govet
+
+## Architecture: DB model → Service → Application (optional) → Controller
+
+```
+├── main.go
+├── application/           # Orchestration — transport-agnostic use cases (multi-service flows); no gin
+├── controllers/           # HTTP — gin handlers, DTOs, requests, mappers
+│   ├── common/            # Shared context helpers (GetUserContextOrAbort, etc.)
+│   ├── health/            # /ping, /version probes
+│   └── v1/                # Versioned API handlers (e.g. v1/me/)
+├── services/              # Business logic — domain models, mappers, GORM / external APIs
+├── database/
+│   ├── model/             # GORM table mirrors (incl. model/i18n/ when needed)
+│   ├── db.go              # DB connection singleton
+│   └── init.sql           # Initial schema script (manual migrations)
+├── router/
+│   └── router.go          # Route registration (group paths sorted alphabetically)
+├── middleware/            # Auth, user provisioning, context, body limit, etc.
+├── infrastructure/        # Identity provider adapters (Supabase), other external integrations
+│   └── auth/
+│       ├── auth.go        # Provider interface + normalized Claims
+│       ├── registry/      # Provider selection from JWT iss
+│       └── provider/      # Supabase (default), other IdPs
+├── config/                # Env-based configuration (App, DB, Logger sub-configs)
+├── commons/
+│   ├── helpers/           # Loggers, ResponseJSON, ShouldBindJSON, pagination
+│   ├── lib/               # JSONB, pointers, validation, bucket URL helpers
+│   └── constants/         # Cross-cutting constants (context keys, version, etc.)
+├── log/                   # Bootstrap: logging levels from config (uses commons/helpers)
+└── datatransfers/         # Generic JSON envelopes (optional — prefer commons/helpers)
+```
+
+## Global conventions
+- `context.Context` always first parameter
+- Use `int64` for IDs, counters, business keys (not uint/uint64) unless DB compatibility forces otherwise
+- File naming: `snake_case.go`
+- Exported: `PascalCase` — unexported: `camelCase` — constants: `UPPER_SNAKE_CASE`
+- All code comments in **English** only
+- Document public functions: `// FunctionName does...`
+- No commented-out dead code — delete it
+- Router paths sorted alphabetically in `router.go`

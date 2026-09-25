@@ -1,0 +1,32 @@
+---
+description: GORM FK associations — each XxxID has a matching relation field for Preload/Joins
+globs: database/model/**/*.go
+alwaysApply: false
+---
+
+
+# Database — GORM model associations
+
+Every foreign-key column `XxxID` has a matching association field of the same stem (without the `ID` suffix) pointing at the related model, so `Preload` / `Joins` work without extra wiring.
+
+```go
+OrderTypeID int        `gorm:"type:int;not null"`
+OrderType   *OrderType `gorm:"foreignKey:OrderTypeID;references:ID"`
+
+OwnerID uuid.UUID `gorm:"type:uuid;not null;index"`
+Owner   *User     `gorm:"foreignKey:OwnerID;references:ID"`
+```
+
+## Rules
+
+- Use pointer association fields (`*OrderType`) so unloaded relations stay `nil`.
+- Add useful inverse sides when needed (has-one / has-many), e.g. `User.Orders []Order` with `foreignKey:OwnerID`.
+- Do not model associations to tables outside the app schema with no local Go type (e.g. `auth.users` under Supabase Auth).
+- Non-SQL links (encrypted refs, opaque tokens) are **not** foreign keys → no GORM association.
+- Keep `database/model/*.go` free of explanatory comments — SQL + these rules are enough.
+
+## Anti-patterns
+
+- FK column without a relation field (`OrderTypeID` alone)
+- Value association fields that look "loaded" when zero-valued
+- Inventing associations for encrypted / non-joinable refs

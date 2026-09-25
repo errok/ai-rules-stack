@@ -1,0 +1,52 @@
+---
+description: GORM table mirrors database/model database/db.go Init connection; entity files GORM tags no JSON; init.sql for schema bootstrap.
+globs: database/db.go,database/model/**/*.go
+---
+
+# Database — Models & Connection
+
+## DB models (`database/model/`)
+- Mirror of DB tables — one file per entity (`user.go`, `order.go`)
+- **PostgreSQL schema `public` (default)** — models live at the **root** of `database/model/`; `TableName()` is the bare table name (e.g. `"users"`).
+- **Any other schema** — one subfolder per schema name under `database/model/<schema>/`:
+  - Example: tables in schema **`i18n`** → `database/model/i18n/notification_type.go`
+  - Go package name = folder name: `package i18n` (import `…/database/model/i18n`)
+  - `TableName()` must stay **schema-qualified**: `"i18n.notification_type"`, etc.
+- GORM tags only — never JSON annotations (models are not returned to the client as API contracts)
+- FK associations: each `XxxID` has a matching relation field — see `gorm-model-associations.md`
+- Naming: structs `PascalCase`, fields `PascalCase`, tables/columns `snake_case`
+- Use `int64` for IDs (not uint)
+- Use `time.Time` for dates
+
+```go
+// ✅
+type User struct {
+  ID        int64     `gorm:"primaryKey;autoIncrement"`
+  Email     string    `gorm:"type:varchar(255);not null;uniqueIndex"`
+  CreatedAt time.Time
+}
+```
+
+## Connection (`database/db.go`)
+- Singleton `*gorm.DB` accessed via `database.GetDB()` (or package-level export during migration)
+- Config loaded from env vars via `config/`
+- `PreferSimpleProtocol: true` on the postgres driver config
+- Log DB connection failures via `helpers.DBLogger`
+- Graceful shutdown: call `database.Close()` from `main.go` defer
+
+## Queries
+- Use **`database.GetDB()`** (or `database.GetDB().WithContext(ctx)`) — do **not** chain `.Debug()` on GORM builders in services
+- SQL trace is enabled when the **DB** log perimeter is `DEBUG` (`LOG_DB_LEVEL` or `LOG_LEVEL`); see `LOGGING.md`
+- Set appropriate timeouts on DB operations where relevant
+- Use transactions for multi-step writes: `database.GetDB().WithContext(ctx).Transaction(...)`
+- Handle GORM errors explicitly: `gorm.ErrRecordNotFound`, constraint violations
+
+## Schema bootstrap
+- Initial schema via `database/init.sql` (idempotent SQL script)
+- No AutoMigrate in production — migrations are managed explicitly
+
+## Naming
+- Tables: singular `snake_case` (`user`, `order_line`) — taxonomy in `table-naming.md`
+- Columns: `snake_case` (`created_at`, `user_id`)
+- Structs: `PascalCase`
+- Fields: `PascalCase` (`ID`, `CreatedAt`, `UserID`)

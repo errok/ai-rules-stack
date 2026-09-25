@@ -1,0 +1,56 @@
+---
+description: DsContainer DsScrollView horizontal padding — never stack enablePadding with default Container px-6; disablePadding XOR enablePadding.
+globs: screens/**/*.tsx,components/**/*.tsx,components/ds/DsContainer.tsx,components/ds/DsScrollView.tsx
+---
+
+# Screen layout — one horizontal padding owner
+
+`DsContainer` applies **`px-6` by default** (`disablePadding` defaults to `false`).
+`DsScrollView` applies **`px-6` only when `enablePadding` is true** (defaults to `false`).
+
+Nesting both → **double horizontal inset**. Pick **one** owner.
+
+## Rule
+
+Inside a screen shell `<DsContainer>…<DsScrollView>…`:
+
+| Owner | Container | ScrollView |
+|---|---|---|
+| **Container** (preferred default) | leave default padding | **do not** pass `enablePadding` |
+| **ScrollView** (full-bleed chrome / custom inset) | pass `disablePadding` | pass `enablePadding` |
+
+Never:
+
+```tsx
+<DsContainer enableTopSafeArea fullHeight>
+  <DsScrollView enablePadding fullHeight menu>
+    …
+  </DsScrollView>
+</DsContainer>
+```
+
+Prefer:
+
+```tsx
+<DsContainer enableTopSafeArea fullHeight>
+  <DsScrollView fullHeight menu>
+    …
+  </DsScrollView>
+</DsContainer>
+```
+
+Or, when the scroll content must own inset (and the container is full-bleed):
+
+```tsx
+<DsContainer disablePadding enableTopSafeArea fullHeight>
+  <DsScrollView enablePadding fullHeight menu>
+    …
+  </DsScrollView>
+</DsContainer>
+```
+
+## Checklist before shipping a screen
+
+1. Does this screen wrap content in `DsContainer` **without** `disablePadding`?
+2. If yes → `DsScrollView` must **omit** `enablePadding`.
+3. `menu` / safe-area props are unrelated — they do not replace horizontal padding ownership.

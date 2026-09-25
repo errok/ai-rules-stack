@@ -1,0 +1,42 @@
+---
+description: Apply when the user asks to create, update or delete a Cursor rule, skill, command, or hook. Also apply when the user says "remember this", "always do X", "never do Y", or when a recurring pattern should be codified.
+globs:
+alwaysApply: false
+---
+
+# Rule Manager
+
+## File locations
+| Type | Location | Naming |
+|---|---|---|
+| Always rule | `.cursor/rules/core-rules/` | `*-always.mdc` |
+| Auto-attached | `.cursor/rules/{category}/` | `*-auto.mdc` |
+| Agent-requested | `.cursor/rules/{category}/` | `*-agent.mdc` |
+| Skill | `.cursor/skills/{name}/SKILL.md` | — |
+| Command | `.cursor/commands/{name}.md` | — |
+
+## Categories
+- `core-rules/` — architecture, global contracts, agent behavior
+- `api-rules/` — controllers, DTOs, requests, router
+- `service-rules/` — services, domain models, GORM queries
+- `database-rules/` — DB models, migrations, connection
+- `logging-rules/` — logging patterns and obligations
+- `security-rules/` — auth, middleware, validation
+- `config-rules/` — env variables, configuration
+
+## Rules
+- Before creating a rule, check if an existing rule already covers the pattern
+- After changing architecture (router path, API version, DB model folder), **verify paths against the repo** — stale paths break agent guidance
+- Keep each .mdc file under ~250 lines — split if needed
+- Never add content to `project-architecture-always` unless it's truly global
+- After any creation or update: `✅ .cursor/rules/{path}/{file}.mdc created/updated`
+- All authored content under `.cursor/` must be **English** (chat summaries to the user may use French if the team prefers)
+
+## Globs vs descriptions (attachment)
+
+- **`globs` frontmatter** — use **unquoted** values: `globs: database/model/**/*.go`. Do **not** write `globs: "database/model/**/*.go"`.
+- **Tight globs** — attach auto rules to the smallest path that needs enforcement (e.g. `application/**/*.go`, `services/**/client.go`), not `**/*.go` unless truly universal.
+- **keyword-rich `description`** — include folders (`controllers/v1`, `middleware`), symbols (`CTRLogger`, `GORM`, `Supabase`), and phrases like "when wiring imports in application layer" so rules surface via @-mention / retrieval when the open file does not match the glob.
+- **`alwaysApply: true`** — only for repo-wide maps (e.g. `project-architecture-always.mdc`); do not widen other rules to compensate.
+- **Overlap** — if two rules would attach on the same edit, narrow one glob or merge guidance into a single file to avoid duplicate context.
+- **No `app/` prefix** — this stack uses a flat layout at repo root; globs and paths must not reference an `app/` wrapper folder.

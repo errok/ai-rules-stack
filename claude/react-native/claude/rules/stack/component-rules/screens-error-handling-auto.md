@@ -1,0 +1,39 @@
+---
+description: Screens (screens/) must own try/catch and user-facing error UX (no try/catch in services).
+globs: screens/**/*.tsx
+---
+# Screens — Error handling (controllers)
+
+## Principle
+- **Screens are controllers**: they orchestrate UX and therefore **must own `try/catch`** around async actions (service calls, store actions, navigation flows).
+- **Services never catch** (`services/**`): let errors bubble up; shape errors and decide UX **in screens** (or hooks/stores called by screens).
+
+## Required behaviour in screens
+- Wrap async flows in `try/catch`
+- Provide user feedback on failure:
+  - inline error state, toast, retry UI, navigation fallback, etc.
+- Disable UI while submitting when needed (e.g. button disabled during async).
+
+## Preferred global error UI
+- Prefer the global bottom-slide error modal via `useErrorModalStore.getState().showError({ code, title, message })`.
+- For **success / info** feedback (email sent, etc.), prefer `useSnackbarStore.getState().show(message, { actionLabel, onAction })`.
+- Mount **`DsErrorModalHost`** and **`DsSnackbarHost`** once at the **app root** (navigation bootstrap / root layout).
+- **Never** import `Alert` from `react-native` in `screens/**` — enforced by Biome `noRestrictedImports`.
+
+## Example
+
+```tsx
+const handleSubmit = useCallback(async () => {
+  setSubmitting(true);
+  try {
+    await doSomething();
+    navigation.goBack();
+  } catch (e) {
+  const code = (e as { code?: number } | null)?.code;
+  const message = e instanceof Error ? e.message : null;
+  useErrorModalStore.getState().showError({ code, title: 'Erreur', message });
+  } finally {
+    setSubmitting(false);
+  }
+}, [navigation]);
+```

@@ -1,0 +1,10 @@
+---
+description: Do not run go test or go test ./... proactively; only when user explicitly requests.
+globs:
+---
+
+# Backend — No automatic `go test`
+
+- Do **not** run `go test` / `go test ./...` proactively.
+- Only run Go test commands when the user **explicitly asks**.
+- If compile validation is needed without tests, prefer lightweight alternatives (e.g. targeted `go test` on a single package) **only if requested**.

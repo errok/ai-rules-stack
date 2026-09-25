@@ -1,0 +1,57 @@
+---
+description: Naming T E Dto PascalCaseScreen screens no Screen suffix on components filename matches export ScreenProps Params use{Name}Store hooks; legacy I* migrate; API …Dto vs domain T… (always on).
+globs:
+alwaysApply: true
+---
+
+# Naming — canonical
+
+## Type & symbol prefixes / suffixes
+
+| Pattern | Convention | Example |
+|---|---|---|
+| Generic app / domain type | Prefix `T` | `TCard`, `TUserProfile`, `TAuthStore` |
+| Enum | Prefix `E` | `ECardSize`, `EAuthStatus`, `EHomeRoutes` |
+| API payload (HTTP request or response) | Suffix `Dto` | `MeDto`, `HelloResponseDto` |
+| Screen file + component (nav entry point) | `PascalCase` + suffix `Screen` — file and export match | `HomeScreen.tsx` → `HomeScreen` |
+| Reusable / local screen component | `PascalCase` — **no** `Screen` suffix — file and export match | `SettingsRow.tsx` → `SettingsRow` |
+| Screen props type | Suffix `ScreenProps` | `HomeScreenProps` |
+| Other component props type | Suffix `Props` | `ButtonProps`, `SettingsRowProps` |
+| Screen route params (React Navigation) | Suffix `Params` | `TCheckoutScreenParams` |
+| Navigator param list | `T{Name}StackParamList` / `TRootTabParamList` | `THomeStackParamList` |
+| Domain stack component | `PascalCase` + suffix `Stack` — file and export match | `HomeStack.tsx` → `HomeStack` |
+| Bottom tab menu | `*Navigator` suffix — **only** for tab bar / menu shell | `BottomTabNavigator.tsx` → `BottomTabNavigator` |
+| Root auth gate | `RootNavigator` | `RootNavigator.tsx` |
+
+**Navigation naming:** `*Navigator` is reserved for the **bottom tab menu** (`BottomTabNavigator`). Domain screen stacks use `*Stack` in `navigation/private/{section}/{Name}Stack.tsx` with co-located `{section}.types.ts`. Do not name domain stacks `*Navigator`.
+
+**File name = exported symbol** (without extension). Applies to screens and components alike. Only navigation entry-point screens use the `Screen` suffix — never on sub-components, even when they live under `screens/`.
+
+## `Dto` vs `T` (do not mix them up)
+
+- **`…Dto`** = types that mirror **HTTP/API** request or response payloads. **Keep the `Dto` suffix** — that is the canonical name for API types. Do **not** rename `MeDto` → `TMe` or similar.
+- **`T…`** = app/domain or internal types that are **not** the API wire shape (UI models, store state, mapped view models, auth domain types, etc.).
+- When migrating legacy `I*`, pick **`…Dto`** if the type is an API contract; pick **`T…`** if it is purely app-layer.
+
+## API DTO names — match backend contracts
+
+When a type mirrors a backend HTTP response/request, use the **exact same `…Dto` name** as in the API contract (and the same JSON field names). Do **not** invent front-only aliases.
+
+- Source of truth: backend OpenAPI / controller DTOs → front `services/**` (or co-located `*Types.ts`).
+- Optional fields: reflect backend optional semantics with `?` in TypeScript.
+- See **Services HTTP** rule (`service-rules/services-http-auto.mdc`).
+
+## Hooks & stores (short)
+
+- Custom hooks: `use{Name}` (`useProgress`, `useAppConfig`).
+- Zustand: `use{Name}Store`, store state types often `T{Name}Store` — see **Zustand stores** under `store-rules/`.
+
+## Legacy `I*` prefix — migrate out, do not add new ones
+
+Historical types use an **`I` prefix** (e.g. `IAuthService`). **Target style** is `T…` for non-API types and **`…Dto`** for API types.
+
+- **New code**: never introduce `ISomething` — use the canonical prefixes/suffixes.
+- **Existing code**: rename `I*` → `T*` (or `…Dto` when it is an API shape) when touching that file or doing a dedicated refactor.
+- **Assistant behaviour**: whenever you encounter or edit a symbol whose name starts with `I` and is a **type** (not `import type` from a third-party lib), **tell the user** that it is legacy naming and should be replaced per this rule (suggest the new name). Offer a rename in the same change if scope is small.
+
+Related: **TypeScript conventions** under `ts-rules/` (`type` vs `interface`).

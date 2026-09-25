@@ -1,0 +1,41 @@
+---
+description: TypeScript strict type not interface import type no any Biome organizeImports legacy I* TSX screens components navigators.
+globs: **/*.ts,**/*.tsx
+---
+
+# TypeScript Conventions
+
+## Types vs interfaces
+- Always use `type`, never `interface` for data contracts
+- Legacy `I*` type names: migrate to `T` / `Dto` per **Naming** (core rules, always on) — assistant should flag them when found.
+
+## Naming
+
+Full cheat sheet: **Naming** (core rules, always applied). Zustand details: **Zustand stores** rule under `store-rules/`.
+
+## Forbidden patterns
+- No `any` — Biome warns, treat as error; use `unknown` + type guard
+- No `interface` for app data types — `type` only (Biome enforces `useConsistentTypeDefinitions`)
+- No `var` — use `const` or `let`
+- No raw `React.FC` — use explicit props type instead (see **Components & screens — structure** under `component-rules/`)
+- No unused imports — Biome enforces `noUnusedImports` as error
+- Always use `import type` for type-only imports (Biome enforces `useImportType`)
+- Always use optional chaining `?.` when applicable (Biome enforces `useOptionalChain`)
+
+## Formatting (Biome enforced — do not override)
+- Indent: 2 spaces
+- Line width: 120 chars
+- Quotes: single `'` in TS/JS, double `"` in JSX
+- Semicolons: always
+- Trailing commas: always (including function params)
+- Arrow function parens: always `(x) => x`
+- Bracket same line: false (JSX closing `>` on new line)
+
+## Import order (Biome organizeImports)
+1. `react`
+2. `react-*`, `@react-*`, `expo*`
+3. `constants/**`, `types/**`, `utils/**`
+4. `hooks/**`, `stores/**`, `services/**`, `navigation/**`
+5. `components/ds/**`, `components/**`, `screens/**`
+6. `assets/**`, `*.png`, `*.svg`
+7. Relative imports, packages

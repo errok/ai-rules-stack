@@ -1,0 +1,41 @@
+---
+description: Table naming taxonomy — type, instance, composition, M-N, status, history
+globs: database/**,database/model/**/*.go,database/tables/**/*.sql,database/init.sql
+---
+
+# Database — table naming
+
+One sentence: **`_type` = lookup · `_instance` = typed occurrence · `parent_child` = composition · `a_b` = M-N · status as text while trivial.**
+
+Use **singular** table names (`user`, `order`, not `users`).
+
+## Suffixes
+
+| Pattern | Role | Typical PK | Examples |
+|---|---|---|---|
+| `*_type` | Shared lookup / catalogue | `integer` | `distance_type`, `session_type`, `color_type`, `payment_type`, `document_type` |
+| `*_instance` | Occurrence of a type | `uuid` | `session_instance` (pair with `session_type`); often the entity stays bare (`order` + `order_type`) |
+| bare entity | Aggregate / pivot / resource | `uuid` | `user`, `member`, `place`, `account`, `organization` |
+| `parent_child` | Strong 1-N composition | `uuid` | `place_lane`, `order_line`, `invoice_item`, `building_floor` |
+| `a_b` | Pure M-N association | `uuid` or composite | `user_role`, `post_tag`, `member_club` |
+| `*_status` / `status_type` | Status catalogue | `integer` | only if labels / i18n / transitions / reuse; else column on the entity |
+| `*_history` / `*_event` / `*_log` | Audit / timeline | `uuid` or `bigserial` | `order_history`, `audit_log`, `login_event` |
+| `*_snapshot` | Frozen copy | `uuid` | `price_snapshot`, `score_snapshot` (or a denormalized FK column on the parent row) |
+| `*_config` / `*_setting` | Preferences | `uuid` | `tenant_config`, `notification_setting` |
+
+## Rules
+
+- Shared catalogue → always `*_type` (never a bare name like `color`; use `color_type`).
+- Explicit typed occurrence → `foo_type` + `foo_instance` when the pair must be obvious; otherwise bare entity + `foo_type` is enough.
+- Strong child of a parent → `parent_child`, not `_instance` and not `_rel`.
+- Pure M-N → `a_b` (dominant-first or alphabetical); do not fake it as a child table.
+- Trivial status (`active` / `archived`) → `text` column (+ check). Introduce `*_status` / `status_type` only when the catalogue earns its keep.
+- Encrypted / non-SQL refs (`*_ref`) are not relational suffixes and must not get GORM FK associations.
+- Prefer encoding domain facts as FKs (`distance_type_id`) over stuffing them into free-text names (`A10`).
+
+## Anti-patterns
+
+- Bare catalogue name (`color`) instead of `color_type`
+- Using a distance/offering join when the real concept is a physical child (`place_lane`)
+- One `*_status` table per entity without a product need
+- Encoding typed facts only in string labels
