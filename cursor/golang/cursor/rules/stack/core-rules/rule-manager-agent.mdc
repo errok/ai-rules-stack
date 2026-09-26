@@ -6,14 +6,21 @@ alwaysApply: false
 
 # Rule Manager
 
+Independent from the Claude rules (`.claude/`): a Cursor rule links only to other Cursor
+rules (`.mdc`), never to a Claude file (`.md`) — and the Claude rules never link here.
+
 ## File locations
+
 | Type | Location | Naming |
 |---|---|---|
-| Always rule | `.cursor/rules/core-rules/` | `*-always.mdc` |
-| Auto-attached | `.cursor/rules/{category}/` | `*-auto.mdc` |
-| Agent-requested | `.cursor/rules/{category}/` | `*-agent.mdc` |
+| Always rule | `.cursor/rules/stack/core-rules/` (stack) · `.cursor/rules/project/` (project) | `*-always.mdc` |
+| Auto-attached | `.cursor/rules/stack/{category}/` (stack) · `.cursor/rules/project/` (project) | `*-auto.mdc` |
+| Agent-requested | `.cursor/rules/stack/{category}/` (stack) · `.cursor/rules/project/` (project) | `*-agent.mdc` |
 | Skill | `.cursor/skills/{name}/SKILL.md` | — |
 | Command | `.cursor/commands/{name}.md` | — |
+
+Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes.
+New rule files do **not** need a suffix.
 
 ## Categories
 - `core-rules/` — architecture, global contracts, agent behavior

@@ -61,5 +61,5 @@ v1route.GET("/orders", middleware.RequireAuth(), orderController.GetList)
   the infrastructure it needs.
 - Dependencies are explicit fields: a controller can be built with other implementations in tests.
 - Services may keep taking their connection at construction (`database.GetDB()`), because the
-  constructor now runs after the connection exists. Per-request state (context, transaction) still
-  goes through `ctx` and `WithTx(tx)`, never through the struct.
+  constructor now runs after the connection exists. Per-request state (the context, and the
+  transaction it carries) still goes through `ctx`, never through the struct.

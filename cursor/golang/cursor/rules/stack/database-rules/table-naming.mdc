@@ -4,7 +4,6 @@ globs: database/**,database/model/**/*.go,database/tables/**/*.sql,database/init
 alwaysApply: false
 ---
 
-
 # Database — table naming
 
 One sentence: **`_type` = lookup · `_instance` = typed occurrence · `parent_child` = composition · `a_b` = M-N · status as text while trivial.**
