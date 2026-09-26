@@ -1,5 +1,5 @@
 ---
-description: GORM table mirrors database/model database/db.go Init connection; entity files GORM tags no JSON; init.sql for schema bootstrap.
+description: GORM table mirrors database/model database/db.go Init connection RunInTx FromContext transaction in context; entity files GORM tags no JSON; init.sql for schema bootstrap.
 globs: database/db.go,database/model/**/*.go
 ---
 
@@ -13,12 +13,8 @@ globs: database/db.go,database/model/**/*.go
   - Go package name = folder name: `package i18n` (import `…/database/model/i18n`)
   - `TableName()` must stay **schema-qualified**: `"i18n.notification_type"`, etc.
 - GORM tags only — never JSON annotations (models are not returned to the client as API contracts)
-- FK associations: each `XxxID` has a matching relation field — see `gorm-model-associations.mdc`
+- FK associations: each `XxxID` has a matching relation field — see `gorm-model-associations.md`
 - Naming: structs `PascalCase`, fields `PascalCase`, tables/columns `snake_case`
-- ID / numeric field types match the column (never `uint` / `uint64`):
-  - `integer` catalogue serials and FKs → `int`
-  - `bigint` → `int64`
-  - entity / instance PKs → `uuid.UUID`
 - Use `time.Time` for dates
 
 ```go
@@ -40,21 +36,22 @@ type Member struct {
 - Config loaded from env vars via `config/`
 - `PreferSimpleProtocol: true` on the postgres driver config
 - Log DB connection failures via `helpers.DBLogger`
-- Graceful shutdown: call `database.Close()` from `main.go` defer
+- Graceful shutdown: call `database.CloseDatabase()` from a `main.go` defer
+- The transaction travels in the context — `db.go` is the only place that knows how:
+  - `RunInTx(ctx, fn func(ctx context.Context) error)` opens one (a savepoint when `ctx` already carries one) and calls `fn` with a `ctx` that carries it; commit on `nil`, rollback on an error or a panic.
+  - `FromContext(ctx, db)` returns the transaction carried by `ctx`, else `db`, bound to `ctx`.
 
 ## Queries
-- Use **`database.GetDB()`** (or `database.GetDB().WithContext(ctx)`) — do **not** chain `.Debug()` on GORM builders in services
+- Do **not** chain `.Debug()` on GORM builders in services
 - SQL trace is enabled when the **DB** log perimeter is `DEBUG` (`LOG_DB_LEVEL` or `LOG_LEVEL`); see `LOGGING.md`
 - Set appropriate timeouts on DB operations where relevant
-- Use transactions for multi-step writes: `database.GetDB().WithContext(ctx).Transaction(...)`
-- Handle GORM errors explicitly: `gorm.ErrRecordNotFound`, constraint violations
 
 ## Schema bootstrap
 - Initial schema via `database/init.sql` (idempotent SQL script)
 - No AutoMigrate in production — migrations are managed explicitly
 
 ## Naming
-- Tables: singular `snake_case` (`user`, `order_line`) — taxonomy in `table-naming.mdc`
+- Tables: singular `snake_case` (`user`, `order_line`) — taxonomy in `table-naming.md`
 - Columns: `snake_case` (`created_at`, `user_id`)
 - Structs: `PascalCase`
 - Fields: `PascalCase` (`ID`, `CreatedAt`, `UserID`)

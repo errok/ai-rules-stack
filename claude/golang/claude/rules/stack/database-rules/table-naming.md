@@ -3,7 +3,6 @@ description: Table naming taxonomy — type, instance, composition, M-N, status,
 globs: database/**,database/model/**/*.go,database/tables/**/*.sql,database/init.sql
 ---
 
-
 # Database — table naming
 
 One sentence: **`_type` = lookup · `_instance` = typed occurrence · `parent_child` = composition · `a_b` = M-N · status as text while trivial.**

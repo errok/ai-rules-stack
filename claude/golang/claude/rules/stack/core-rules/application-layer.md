@@ -1,7 +1,8 @@
 ---
-description: application orchestration New() no gin; controllers must not wire 2+ level-1 services per handler—use application/<object>; multi-service flows.
+description: application orchestration New() no gin no gorm; database.RunInTx transaction in ctx; errors.Is on service sentinels; controllers must not wire 2+ level-1 services per handler—use application/<object>; multi-service flows.
 globs: application/**/*.go,controllers/**/*.go
 ---
+
 # Application Layer (Orchestration)
 
 The `application/` tree hosts **transport-agnostic orchestration** for a primary object that may depend on multiple level-1 services.
@@ -20,15 +21,37 @@ The `application/` tree hosts **transport-agnostic orchestration** for a primary
   - compose results into a single outcome for controllers/other entrypoints
 - `application/<object>` must **not**:
   - import or depend on `gin`
-  - use `database/model` **for entity/table structs** or persistence (DB access belongs to services)
+  - touch the database: no `gorm`, no `database/model`, no `database.GetDB()` — DB access belongs to services; the only `database` symbol it uses is `RunInTx` (see **Transactions**)
 - **Config keys:** If orchestration needs a config key string, prefer encapsulating the key inside a dedicated service (e.g. `services/appconfig`).
 
 ## Cross-service flows
-- Load entities via level-1 services (`GetByID`, etc.); avoid ultra-specific getters when a normal fetch by id is enough.
+- Load entities via level-1 services (`GetOneByID`, etc.); avoid ultra-specific getters when a normal fetch by id is enough.
 - Read configuration via a config service, not raw DB queries in the application package.
 - Apply **pure** rules from `services/<domain>/<pure_subpackage>/`.
 - Persist mutations via focused service methods.
 - **Product defaults:** If a required config is missing, define explicit behavior instead of failing with a generic DB error unless product requires otherwise.
+
+## Transactions
+- A write that spans several services runs in **one transaction owned by the orchestrator**, which still only calls services:
+
+```go
+err := database.RunInTx(ctx, func(ctx context.Context) error {
+	// ctx now carries the transaction: every service call below joins it.
+	order, err := o.orders.Create(ctx, input)
+	if err != nil {
+		return fmt.Errorf("create order: %w", err)
+	}
+	return o.stocks.UpdateReserved(ctx, order.Lines)
+})
+```
+
+- Pass the callback's `ctx` (not the outer one) to every service call inside: services pick the transaction up from it (see **Queries — context and transaction** in the services rule). The orchestrator never holds a `*gorm.DB` and never binds a service to a transaction itself.
+- Returning an error (or panicking) rolls everything back; returning `nil` commits.
+
+## Errors
+- Branch on the sentinels services export (`errors.Is(err, srvOrder.ErrOrderNotFound)`), never on a `gorm` error.
+- Translate a sentinel into a use-case error only when its meaning changes for the caller (a missing catalogue row becomes `ErrInvalidCategory` → 400); otherwise wrap it with `%w` so controllers still match it.
+- Export the errors controllers map to HTTP codes next to the orchestrator (`var ErrOrderNotFound = …`).
 
 ## Instantiation
 - Prefer explicit construction:

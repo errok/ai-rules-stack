@@ -5,21 +5,17 @@ globs:
 
 # Rule Manager
 
-/ Ported from Cursor. In Claude Code there is **no automatic glob-based rule
-attachment**: `.claude/rules/**` files are a library, and `CLAUDE.md` is what
-wires them in. Keep both in sync. /
-
 ## File locations
 
 | Type | Location | Notes |
 |---|---|---|
-| Always-on rule | `.claude/rules/core-rules/` | Referenced from root `CLAUDE.md` with `@.claude/rules/core-rules/{file}.md` so it is always in context |
-| Scoped rule | `.claude/rules/{category}/` | Listed in the **Domain rules** table of `CLAUDE.md` with its `globs`; the agent reads it before editing files that match |
+| Always-on rule | `.claude/rules/stack/core-rules/` (stack) · `.claude/rules/project/` (project) | `@`-imported from `STACK.md` (stack) or `CLAUDE.md` (project) so it is always in context; empty `globs:` line |
+| Scoped rule | `.claude/rules/stack/{category}/` (stack) · `.claude/rules/project/` (project) | Injected by the hook before an `Edit`/`Write` to a file matching its `globs:` (see **Attachment model**) |
 | Skill | `.claude/skills/{name}/SKILL.md` | Model-invoked from its own `description` |
 | Command | `.claude/commands/{name}.md` | Slash command (`/{name}`) |
 
-Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes
-(from the Cursor port). New rule files do **not** need a suffix — name them
+Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes.
+New rule files do **not** need a suffix — name them
 `{topic}.md`.
 
 ## Categories
@@ -44,7 +40,7 @@ Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes
 - Prefer a new rule file over piling more into an always-on `core-rules/` file
 
 ## Attachment model (Claude Code)
-- **Always-on:** only true repo-wide maps (architecture, naming, no-unrequested-cleanup). Add them to `CLAUDE.md` via `@`-import, and leave their `globs:` line empty so the hook does not double-inject them.
+- **Always-on:** only true repo-wide maps (architecture, naming, no-unrequested-cleanup). `@`-import them in `STACK.md` (project ones in `CLAUDE.md`), and leave their `globs:` line empty so the hook does not double-inject them.
 - **Scoped:** everything else. Give the rule a keyword-rich `description` (topics, folder names, symbols like `DsIcon`, `DsModal`) and a tight `globs:` line (smallest subtree that needs it, unquoted, comma-separated). The `PreToolUse` hook `.claude/hooks/inject-rules.mjs` reads `globs:` and injects the rule before an `Edit`/`Write` to a matching file (once per session). `globs:` is the only rule index — `CLAUDE.md` does not list scoped rules. The user can `@`-mention it explicitly.
 - **`globs:` is load-bearing** — an inaccurate or missing glob means the rule never fires. After renaming/moving folders, re-check every `globs:`.
 - **Overlap** between globs is fine when it keeps a rule discoverable; avoid duplicating the *same* guidance across two files.

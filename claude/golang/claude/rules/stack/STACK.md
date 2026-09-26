@@ -5,8 +5,8 @@
 them. It is reached through the symlink `.claude/rules/stack/`, so everything here
 must hold for *any* service on the stack.
 
-Ported from `.cursor/` (Cursor rules, symlinked). **Do not edit `.cursor/`** — it
-is the upstream source; change rules here under `.claude/` instead.
+Independent from the Cursor rules (`.cursor/`): a Claude rule links only to other Claude
+rules (`.md`), never to a Cursor file (`.mdc`) — and the Cursor rules never link here.
 
 ## Generic vs project
 

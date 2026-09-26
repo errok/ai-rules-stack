@@ -7,7 +7,7 @@ globs: screens/**/*.tsx,components/**/*.tsx,components/ds/index.ts,components/ds
 ## TypeScript (tsx — same contracts as the **TypeScript conventions** rule under `ts-rules/`)
 - Use `type` for data shapes, not `interface` (`useConsistentTypeDefinitions`)
 - `import type` for type-only imports; no `any` (use `unknown` + guards)
-- Full Biome / formatting list lives in the **TypeScript conventions** rule (auto-attached on `.ts` / navigators / typical entry modules)
+- Full Biome / formatting list lives in the **TypeScript conventions** rule (injected on every `.ts` / `.tsx` file)
 
 ## File naming
 

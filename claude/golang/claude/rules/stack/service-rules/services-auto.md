@@ -1,5 +1,5 @@
 ---
-description: GORM services domain mapper Service struct; level-1 services must not import each other (orchestrate in application); external API clients see external-api-clients.
+description: GORM services domain mapper Service struct; level-1 services must not import each other (orchestrate in application); database.FromContext ctx transaction; gorm.ErrRecordNotFound translated into Err*NotFound sentinels; external API clients see external-api-clients.
 globs: services/**/*.go
 ---
 
@@ -16,7 +16,7 @@ This codebase enforces **strict service boundaries** to keep the dependency grap
 ### Intra-domain subpackages (allowed)
 - Subpackages within a single domain may call their domain parent:
   - Example (allowed): `services/order/pricing` importing `services/order/discounts`
-- **Pure subpackages** (`services/<domain>/<pure>/`) have no DB and no cross–level-1 calls; see `pure-subpackages.mdc`.
+- **Pure subpackages** (`services/<domain>/<pure>/`) have no DB and no cross–level-1 calls; see `pure-subpackages.md`.
 
 ### Where orchestration belongs
 - Multi-service orchestration belongs to:
@@ -28,7 +28,7 @@ Each service lives in `services/<name>/` (nested domains use subfolders) with th
 
 | File | Role |
 |---|---|
-| `[name]_domain.go` | Business models — no JSON, no GORM tags, **no methods** (data fields only; see below) |
+| `[name]_domain.go` | Business models and error sentinels — no JSON, no GORM tags, **no methods** (data fields only; see below) |
 | `[name]_mapper.go` | `ToDomain()` (model→domain), `ToModel()` (domain→model), `NewDomain()` |
 | `[name].go` | Business logic + GORM queries via `*gorm.DB` |
 
@@ -63,18 +63,35 @@ if err := db.Where(...).Where(...).First(&model).Error; err != nil { ... }
 ```
 
 - Prefer GORM `Preload`/`Joins` over manual joins when relations are declared on models
-- Use transactions for multi-step writes
-- Define business-specific errors in `[name]_domain.go`
-- Always wrap GORM operations with context: methods take `context.Context` as the **first** parameter after the receiver, and queries use `db.WithContext(ctx)` (never bare `s.db.Where(...)` on request paths).
 
-## Method naming (services) — same CRUD verbs as controllers
-- **List:** `GetList`, `GetListByX`, `GetListHistory`
-- **One:** `GetOne`, `GetOneByID`, `GetOneByExternalID`
-- **Create / Update / Delete:** `Create`, `Update`, `Delete` (plus qualifier when needed)
-- If the method returns a **single logical value** but is not a fetch, do not force `GetOne`:
-  - prefer explicit names like `GetLast...`, `Compute...` when it matches the domain better
-- **Forbidden legacy:** `ListActive`, `GETmoods`-style names — use `GetList` / `GetOne` (+ filter in the name or args)
+## Queries — context and transaction
+- Start every query from **`database.FromContext(ctx, s.db)`**: it returns the caller's transaction when `ctx` carries one, else `s.db` bound to `ctx`. Never a bare `s.db` or `s.db.WithContext(ctx)`, and no `WithTx(tx)` constructor.
+- The service never decides whether it runs in a transaction: the orchestrator opens it and hands the `ctx` down (see **Transactions** in the application layer rule).
+- A multi-statement write inside one service opens `database.FromContext(ctx, s.db).Transaction(func(tx *gorm.DB) error { … })`; inside a caller's transaction it becomes a savepoint.
 
-## Logging
-- Use `helpers.SRCLogger` — never logrus directly
-- Log important business actions and errors with context
+## Errors — translate GORM into sentinels
+A service never lets a `gorm` error describe an expected outcome: it returns an explicit sentinel declared in `[name]_domain.go`, which `application/` and controllers match with `errors.Is` to answer the front properly.
+
+| Outcome | Return |
+|---|---|
+| `gorm.ErrRecordNotFound` | `Err{Entity}NotFound` |
+| Targeted `Update` / `Delete` with `RowsAffected == 0` | `Err{Entity}NotFound` |
+| Business refusal (duplicate, invalid input) | its own sentinel (`ErrUserAlreadyExists`, `ErrInvalidQuantity`) |
+| Any other DB error | log it with `SRCLogger`, return it unchanged (the caller answers 500) |
+
+```go
+// user_domain.go
+var (
+	ErrUserAlreadyExists = errors.New("user already exists")
+	ErrUserNotFound      = errors.New("user not found")
+)
+
+// user.go
+if err := query.First(&row).Error; err != nil {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, ErrUserNotFound
+	}
+	helpers.SRCLogger.Error("UserService.GetOneByAuthID: %v", err)
+	return nil, err
+}
+```

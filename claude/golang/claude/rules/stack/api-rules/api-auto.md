@@ -1,5 +1,5 @@
 ---
-description: gin handlers DTO mapper HTTP router registration /api/v1 public nested resources HTTP 400 401 404 controllers/v1.
+description: gin handlers DTO mapper HTTP router registration /api/v1 public nested resources sealed controller roots errors.Is sentinels HTTP 400 401 404 controllers/v1.
 globs: controllers/**/*.go,router/**/*.go
 ---
 
@@ -9,6 +9,11 @@ globs: controllers/**/*.go,router/**/*.go
 - Versioned API handlers: `controllers/v1/<resource>/` with `*_dto.go`, `*_request.go` (when inputs exist), `*_mapper.go`, `<resource>.go`
 - Cross-cutting controllers: `controllers/health/`, `controllers/common/`
 - **Nested resources (URL owns the tree):** a route under `/parent/:id/child` lives in the **parent** controller package as a subfolder with the same file pattern — e.g. `GET /sessions/:id/target-cards` → `controllers/v1/session/targetcard/` (not `controllers/v1/targetcard/` alone). Do **not** register nested parent URL handlers on the child's top-level controller just because the child owns the domain table.
+- **Controller roots are sealed** (same rule as level-1 services): each package directly under `controllers/v1/` is a controller root.
+  - A root **never** imports another root — no sibling DTO, request, mapper or handler (`controllers/v1/order/line` must not import `controllers/v1/product`).
+  - **Inside** one root, subpackages may import the root and each other (`controllers/v1/order/line` may use `controllers/v1/order`).
+  - `controllers/common/` is the only package every controller may import.
+  - Two roots returning the same wire shape each keep their own `*_dto.go` + `*_mapper.go` (same struct names and `json` tags) instead of sharing one.
 
 | File | Role |
 |---|---|
@@ -56,21 +61,6 @@ func NewController() *Controller {
 
 - Do **not** use lowercase-only aliases (`srvuser`) or `{resource}Service` as the **package** import alias.
 
-## Method naming (controllers) — CRUD verbs
-Handlers use **Get / Create / Update / Delete** (not HTTP verbs glued to the resource name).
-
-| Intent | Handler prefix | Examples |
-|---|---|---|
-| List / collection | `GetList` | `GetList`, `GetListBySession` |
-| Single read | `GetOne` | `GetOne`, `GetOneByID` |
-| Create | `Create` | `Create`, `CreateForSession` |
-| Update (PATCH/PUT) | `Update` | `Update`, `UpdateFavorite` |
-| Delete | `Delete` | `Delete`, `DeleteByID` |
-
-- Suffix with a qualifier when several handlers share a verb (`GetListBySession`, `UpdateFavorite`).
-- **Forbidden legacy:** `GETme`, `POSTsession`, `PATCHtargetCard`, `GETmoods`, etc.
-- Align service method verbs the same way when adding new service APIs (`GetList` / `GetOne` / `Create` / `Update` / `Delete`) — see **Services** under `service-rules/`.
-
 ## Routes
 - Current API group: **`/api/v1`** (see `router/router.go`)
 - Register routes in `router/router.go`; keep groups readable (public vs protected)
@@ -78,7 +68,7 @@ Handlers use **Get / Create / Update / Delete** (not HTTP verbs glued to the res
   - **Root probes:** `GET /ping`, `GET /version` (via `controllers/health/`)
   - **Unauthenticated v1 reads:** `router.Group("/api/v1")` without auth middleware, or a dedicated `/api/v1/public` group for data reachable before login
 - **Authenticated app API:** `router.Group("/api/v1")` with `AuthCheck`, `EnsureUserExists` (and optional `LanguageMiddleware`)
-- Gzip + `BodySizeLimit` + `LoggerMiddleware` apply globally; protected `/api/v1` stack is documented in `security-rules/security-auto.mdc`
+- Gzip + `BodySizeLimit` + `LoggerMiddleware` apply globally; protected `/api/v1` stack is documented in `security-rules/security-auto.md`
 
 ### Route groups (mandatory)
 - **One** `v1route.Group("/resource")` **per top-level resource** (same pattern as `/me`).
@@ -89,14 +79,12 @@ Handlers use **Get / Create / Update / Delete** (not HTTP verbs glued to the res
 ## HTTP responses
 - Success: return DTO / payload as defined by the handler
 - Use `helpers.AbortWithError`, `helpers.ResponseJSON`, or `helpers.ShouldBindJSON` for consistent error shapes (error envelope lives in `commons/helpers`, not a top-level `datatransfers/` package)
+- Map errors to status codes with `errors.Is` on the sentinels the orchestrator or service exports (`errors.Is(err, appOrder.ErrOrderNotFound)` → 404) — never `err == …`, never a `gorm` error
 - Errors: appropriate HTTP codes with clear messages
   - **400** — validation / bad input
   - **401** — missing or invalid JWT
   - **404** — not found
-  - **500** — internal error (no stack trace to client; generic message only — see `security-rules/security-auto.mdc`)
-
-## Logging
-- Use `helpers.CTRLogger` in controllers — see `logging-rules/logging-auto.mdc`
+  - **500** — internal error (no stack trace to client; generic message only — see `security-rules/security-auto.md`)
 
 ## Context helpers
 - Use `controllers/common/GetUserContextOrAbort(c, caller)` to extract authenticated user context — do not re-parse JWT in handlers

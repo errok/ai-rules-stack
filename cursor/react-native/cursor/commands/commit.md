@@ -17,7 +17,7 @@ Commit the current uncommitted work in this repository.
 - Never push unless the user explicitly asks.
 - Do not commit secrets (`.env`, credentials, tokens, etc.). Warn and skip those files.
 - Never use interactive git flags (`-i`).
-- **Never** add `Co-authored-by: Cursor` (or any agent co-author) — no `--trailer Co-authored-by:…` for Cursor. See `core-rules/no-cursor-coauthor-always.mdc`.
+- **Never** add `Co-authored-by: Cursor` (or any agent co-author) — no `--trailer Co-authored-by:…` for Cursor.
 
 ## Workflow
 

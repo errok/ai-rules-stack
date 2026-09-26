@@ -30,7 +30,7 @@ globs:
 │   ├── db.go              # DB connection singleton
 │   └── init.sql           # Initial schema script (manual migrations)
 ├── router/
-│   └── router.go          # Route registration (group paths sorted alphabetically)
+│   └── router.go          # Route registration
 ├── middleware/            # Auth, user provisioning, context, body limit, etc.
 ├── infrastructure/        # Identity provider adapters (Supabase), other external integrations
 │   └── auth/
@@ -57,4 +57,18 @@ globs:
 - All code comments in **English** only
 - Document public functions: `// FunctionName does...`
 - No commented-out dead code — delete it
-- Router: one `Group` per resource, groups sorted alphabetically in `router.go`
+
+## Method names — CRUD verbs
+Controller handlers, `application/` orchestrators and services name their methods by intent, with the same verbs (not HTTP verbs glued to the resource name):
+
+| Intent | Prefix | Examples |
+|---|---|---|
+| List / collection | `GetList` | `GetList`, `GetListBySession`, `GetListHistory` |
+| Single read | `GetOne` | `GetOne`, `GetOneByID`, `GetOneByExternalID` |
+| Create | `Create` | `Create`, `CreateForSession` |
+| Update (PATCH/PUT) | `Update` | `Update`, `UpdateFavorite` |
+| Delete | `Delete` | `Delete`, `DeleteByID` |
+
+- Suffix with a qualifier when several methods share a verb (`GetListBySession`, `UpdateFavorite`).
+- A method that returns a single logical value but is not a fetch keeps an explicit name (`GetLast…`, `Compute…`) instead of a forced `GetOne`.
+- **Forbidden legacy:** `GETme`, `POSTsession`, `PATCHtargetCard`, `GETmoods`, `ListActive`, etc.
