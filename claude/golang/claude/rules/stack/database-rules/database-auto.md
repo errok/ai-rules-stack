@@ -13,17 +13,25 @@ globs: database/db.go,database/model/**/*.go
   - Go package name = folder name: `package i18n` (import `…/database/model/i18n`)
   - `TableName()` must stay **schema-qualified**: `"i18n.notification_type"`, etc.
 - GORM tags only — never JSON annotations (models are not returned to the client as API contracts)
-- FK associations: each `XxxID` has a matching relation field — see `gorm-model-associations.md`
+- FK associations: each `XxxID` has a matching relation field — see `gorm-model-associations.mdc`
 - Naming: structs `PascalCase`, fields `PascalCase`, tables/columns `snake_case`
-- Use `int64` for IDs (not uint)
+- ID / numeric field types match the column (never `uint` / `uint64`):
+  - `integer` catalogue serials and FKs → `int`
+  - `bigint` → `int64`
+  - entity / instance PKs → `uuid.UUID`
 - Use `time.Time` for dates
 
 ```go
-// ✅
-type User struct {
-  ID        int64     `gorm:"primaryKey;autoIncrement"`
-  Email     string    `gorm:"type:varchar(255);not null;uniqueIndex"`
-  CreatedAt time.Time
+// ✅ catalogue
+type SessionType struct {
+  ID   int    `gorm:"type:int;primaryKey;autoIncrement"`
+  Code string `gorm:"type:text;not null"`
+}
+
+// ✅ entity (uuid) — see also table-naming for *_instance
+type Member struct {
+  ID     uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+  Handle string    `gorm:"type:text;not null"`
 }
 ```
 
@@ -46,7 +54,7 @@ type User struct {
 - No AutoMigrate in production — migrations are managed explicitly
 
 ## Naming
-- Tables: singular `snake_case` (`user`, `order_line`) — taxonomy in `table-naming.md`
+- Tables: singular `snake_case` (`user`, `order_line`) — taxonomy in `table-naming.mdc`
 - Columns: `snake_case` (`created_at`, `user_id`)
 - Structs: `PascalCase`
 - Fields: `PascalCase` (`ID`, `CreatedAt`, `UserID`)

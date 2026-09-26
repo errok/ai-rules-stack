@@ -16,7 +16,7 @@ This codebase enforces **strict service boundaries** to keep the dependency grap
 ### Intra-domain subpackages (allowed)
 - Subpackages within a single domain may call their domain parent:
   - Example (allowed): `services/order/pricing` importing `services/order/discounts`
-- **Pure subpackages** (`services/<domain>/<pure>/`) have no DB and no cross–level-1 calls; see `pure-subpackages.md`.
+- **Pure subpackages** (`services/<domain>/<pure>/`) have no DB and no cross–level-1 calls; see `pure-subpackages.mdc`.
 
 ### Where orchestration belongs
 - Multi-service orchestration belongs to:
@@ -65,15 +65,15 @@ if err := db.Where(...).Where(...).First(&model).Error; err != nil { ... }
 - Prefer GORM `Preload`/`Joins` over manual joins when relations are declared on models
 - Use transactions for multi-step writes
 - Define business-specific errors in `[name]_domain.go`
-- Always wrap GORM operations with context: `db.WithContext(ctx)`
+- Always wrap GORM operations with context: methods take `context.Context` as the **first** parameter after the receiver, and queries use `db.WithContext(ctx)` (never bare `s.db.Where(...)` on request paths).
 
-## Method naming (services)
-- **List queries / reads**: prefix with **`GetList`**
-  - Examples: `GetList`, `GetListByX`, `GetListHistory`
-- **Single-row reads**: prefix with **`GetOne`**
-  - Examples: `GetOne`, `GetOneByID`, `GetOneByExternalID`
+## Method naming (services) — same CRUD verbs as controllers
+- **List:** `GetList`, `GetListByX`, `GetListHistory`
+- **One:** `GetOne`, `GetOneByID`, `GetOneByExternalID`
+- **Create / Update / Delete:** `Create`, `Update`, `Delete` (plus qualifier when needed)
 - If the method returns a **single logical value** but is not a fetch, do not force `GetOne`:
   - prefer explicit names like `GetLast...`, `Compute...` when it matches the domain better
+- **Forbidden legacy:** `ListActive`, `GETmoods`-style names — use `GetList` / `GetOne` (+ filter in the name or args)
 
 ## Logging
 - Use `helpers.SRCLogger` — never logrus directly

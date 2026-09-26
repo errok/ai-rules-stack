@@ -10,6 +10,13 @@ globs: middleware/**/*.go,infrastructure/**/*.go,services/**/authctx.go,services
 - **Default provider:** Supabase — JWKS ES256 validation, claims normalized to `infrastructure/auth.Claims`.
 - **No ad-hoc JWT parsing in handlers** — reuse middleware + `infrastructure/auth` + registry.
 
+## Middleware stays thin (no business monolith)
+Middleware is **transport / cross-cutting only**: auth, body limits, gzip, recovery, access logs, request-context enrichment (identity, locale).
+- **Allowed:** validate JWT, attach claims / user context, reject oversized bodies, log the request.
+- **Forbidden in middleware:** product use cases, multi-service orchestration, domain validation beyond “is this identity usable”, feature workflows.
+- If a change needs domain rules or several services → put it in `services/` or `application/`, call it from a controller — do **not** grow `middleware/` into a second app layer.
+- Lightweight identity lookup to enrich context (e.g. `EnsureUserExists`) is fine; keep it small and stable.
+
 ## Protected API stack (see `router/router.go`)
 Typical order on the **`/api/v1`** group:
 1. `middleware.AuthCheck()` — JWT validation via `infrastructure/auth/registry`

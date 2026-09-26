@@ -3,6 +3,7 @@ description: Table naming taxonomy — type, instance, composition, M-N, status,
 globs: database/**,database/model/**/*.go,database/tables/**/*.sql,database/init.sql
 ---
 
+
 # Database — table naming
 
 One sentence: **`_type` = lookup · `_instance` = typed occurrence · `parent_child` = composition · `a_b` = M-N · status as text while trivial.**
@@ -21,7 +22,7 @@ Use **singular** table names (`user`, `order`, not `users`).
 | `*_status` / `status_type` | Status catalogue | `integer` | only if labels / i18n / transitions / reuse; else column on the entity |
 | `*_history` / `*_event` / `*_log` | Audit / timeline | `uuid` or `bigserial` | `order_history`, `audit_log`, `login_event` |
 | `*_snapshot` | Frozen copy | `uuid` | `price_snapshot`, `score_snapshot` (or a denormalized FK column on the parent row) |
-| `*_config` / `*_setting` | Preferences | `uuid` | `tenant_config`, `notification_setting` |
+| `*_config` / `*_setting` | Preferences | `uuid` | `tenant_config`, `member_setting`, `notification_setting` |
 
 ## Rules
 
@@ -36,6 +37,7 @@ Use **singular** table names (`user`, `order`, not `users`).
 ## Anti-patterns
 
 - Bare catalogue name (`color`) instead of `color_type`
+- Bare preference table (`setting`) instead of `member_setting` / `*_setting`
 - Using a distance/offering join when the real concept is a physical child (`place_lane`)
 - One `*_status` table per entity without a product need
 - Encoding typed facts only in string labels

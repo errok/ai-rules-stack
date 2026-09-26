@@ -39,19 +39,22 @@ globs:
 │       └── provider/      # Supabase (default), other IdPs
 ├── config/                # Env-based configuration (App, DB, Logger sub-configs)
 ├── commons/
-│   ├── helpers/           # Loggers, ResponseJSON, ShouldBindJSON, pagination
+│   ├── helpers/           # Loggers, AbortWithError, ResponseJSON, ShouldBindJSON, pagination
 │   ├── lib/               # JSONB, pointers, validation, bucket URL helpers
 │   └── constants/         # Cross-cutting constants (context keys, version, etc.)
-├── log/                   # Bootstrap: logging levels from config (uses commons/helpers)
-└── datatransfers/         # Generic JSON envelopes (optional — prefer commons/helpers)
+└── log/                   # Bootstrap: logging levels from config (uses commons/helpers)
 ```
 
 ## Global conventions
 - `context.Context` always first parameter
-- Use `int64` for IDs, counters, business keys (not uint/uint64) unless DB compatibility forces otherwise
+- **Numeric / ID types** — never `uint` / `uint64`. Use the Go type that matches the Postgres column; `int` + `int64` + `uuid` cover the stack:
+  - catalogue / small `integer` serial PKs and their FKs → `int`
+  - `bigint` / large counters → `int64`
+  - entity / instance PKs → `uuid.UUID`
+  - Do **not** force `int64` everywhere
 - File naming: `snake_case.go`
 - Exported: `PascalCase` — unexported: `camelCase` — constants: `UPPER_SNAKE_CASE`
 - All code comments in **English** only
 - Document public functions: `// FunctionName does...`
 - No commented-out dead code — delete it
-- Router paths sorted alphabetically in `router.go`
+- Router: one `Group` per resource, groups sorted alphabetically in `router.go`
