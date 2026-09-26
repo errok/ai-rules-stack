@@ -1,6 +1,7 @@
 ---
 description: DsContainer DsScrollView horizontal padding — never stack enablePadding with default Container px-6; disablePadding XOR enablePadding.
-globs: screens/**/*.tsx,components/**/*.tsx,components/ds/DsContainer.tsx,components/ds/DsScrollView.tsx
+paths:
+  - "screens/**/*.tsx"
 ---
 
 # Screen layout — one horizontal padding owner

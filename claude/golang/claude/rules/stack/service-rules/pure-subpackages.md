@@ -1,7 +1,8 @@
 ---
 title: Pure domain subpackages
 description: Stateless pure functions under services/domain/subpackage; no GORM no HTTP; external API clients use external-api-clients rule.
-globs: services/*/*/**/*.go
+paths:
+  - "services/*/*/**/*.go"
 ---
 
 # Pure Domain Subpackages

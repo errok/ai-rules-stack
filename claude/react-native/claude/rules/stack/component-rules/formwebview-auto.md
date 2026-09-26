@@ -1,6 +1,7 @@
 ---
 description: Embedded web forms Typeform shared FormWebView onComplete locale headers not ad-hoc WebView per screen.
-globs: components/**/*.tsx,screens/**/*.tsx
+paths:
+  - "**/*WebView*.tsx"
 ---
 
 # Form WebView — shared wrapper

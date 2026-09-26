@@ -1,11 +1,10 @@
 ---
 description: Expo RN stack folders auth HTTP fetch helper design-system status bar global map always on — no src/ prefix in this repo.
-globs:
 ---
 
 # Project — Architecture reference
 
-**This repo:** application code lives at the **repository root** (no `src/` prefix). When reusing these rules elsewhere, keep the **principles** and update **globs** if your root differs.
+**This repo:** application code lives at the **repository root** (no `src/` prefix).
 
 ## Stack
 - Expo (managed workflow) + React Native
@@ -18,13 +17,6 @@ globs:
 - No test suite currently
 
 ## Project structure
-
-**Design system (repo root, NativeWind)**
-
-- `design-tokens/` — token source modules (primitives → semantic → component). DS tokens mirror `components/ds/`: `design-tokens/components/ds/` + `ds/composed/`. Consumed by `tailwind.config.js` (`colors.js` NativeWind bridge) and `Ds*` via `style`.
-- `tailwind/` — Tailwind-only helpers (`blocklist.js`, plugins when present)
-
-See the **design tokens & Tailwind** rule under `ui-rules/` when editing colors, typography, gradients, or Tailwind config.
 
 ```
 App.tsx            # Bootstrap + NavigationContainer + RootNavigator
@@ -45,36 +37,27 @@ utils/             # Utility functions
 config/            # Environment, Supabase, Figma
 i18n/              # Localization
 assets/            # Static resources
+design-tokens/     # Token modules: primitives → semantic → component (mirrors components/ds/)
+tailwind/          # Tailwind-only helpers (blocklist, plugins)
 ```
 
 ## Data flow
 Expo entry → `App.tsx` → navigators → screens → components + hooks → services ↔ stores
 theme / types / utils: transversal
 
-## Stores vs hooks
-- **Stores** (`stores/`): shared state + synchronous setters only — **never** import `services/**` or fetch inside a store (see **Zustand stores** rule under `store-rules/`).
+## Layers
+- **Stores** (`stores/`): shared state + synchronous setters only — never services or fetch.
 - **Hooks** (`hooks/`): orchestration — call services, then update stores via setters.
-
-## Auth
-- Contract: `TAuthService` in `services/auth/authTypes.ts`
-- Provider selection via `AUTH_PROVIDER` env (default: `supabase`)
-- Never import a concrete auth provider directly — always go through `services/auth/index.ts`
-
-## HTTP
-- Authenticated HTTP calls go through `utils/fetch.ts` helper `r`
-- Public endpoints (no JWT): `rPublic` from `utils/fetch.ts`
-- Never use raw `fetch()` directly in services or components
-- `r` handles: Bearer token via `authService.getIdToken()`, platform headers, app version, 45s timeout, supports caller cancellation via `AbortSignal`, one retry after 401 with token refresh
+- **HTTP**: authenticated calls through `r`, public ones through `rPublic` (`utils/fetch.ts`) — never raw `fetch()`.
+- **Auth**: never import a concrete provider — always go through `services/auth/index.ts` (`TAuthService`).
 
 ## Design-system primitives
 - Always prefer `components/ds/*` (and `components/ds/composed/*` when composed) over raw RN primitives (View, Text, TouchableOpacity…)
 - Only use raw RN primitives when no DS equivalent exists
-- **Product apps never fork the DS** — primitives **and** `ds/composed`. Missing API → `/promote-ds` onto `main`. Product chrome → `components/` (no `Ds` prefix), not a new composed `Ds*`. Theme only via primitives/semantic — see **Product apps do not override the DS** under `component-rules/`.
+- **Product apps never fork the DS** (primitives or `ds/composed`) — see **Product apps do not override the DS** under `component-rules/`.
 
 ## Status bar
 - Prefer `expo-status-bar` at the app shell; keep tab/header chrome aligned with theme tokens.
 
 ## Rule maintenance
-- When introducing a new pattern, convention, or architectural decision during a session, proactively suggest creating or updating a rule in `.claude/rules/`
-- When the user says "remember", "always", "never", or "from now on" → apply the rule-manager-agent rule immediately
-- Do not wait for `/learn` to be called — suggest rule updates inline when relevant
+- A new convention or decision, or the user saying "remember", "always", "never", "from now on" → propose or apply a rule update right away (see the rule-manager rule in `core-rules/`), without waiting for `/learn`.

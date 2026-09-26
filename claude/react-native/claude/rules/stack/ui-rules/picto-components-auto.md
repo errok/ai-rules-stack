@@ -1,6 +1,7 @@
 ---
 description: Pictograms (pictos) as reusable UI components live under components/Picto; avoid ad-hoc copies; keep API simple (size/color/circle).
-globs: components/Picto/**
+paths:
+  - "components/**/*Picto*.tsx"
 ---
 
 # Picto components — `components/Picto/*`

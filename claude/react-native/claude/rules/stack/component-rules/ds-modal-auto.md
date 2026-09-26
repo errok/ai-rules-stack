@@ -1,6 +1,8 @@
 ---
 description: DsModal vs DsModalFullScreen EDsModalMode Center BottomSlide MODAL_MODE_CONFIG react-native-modal product dialogs screens.
-globs: components/ds/composed/**/*.tsx,components/ds/**/*Modal*.tsx,screens/**/*.tsx,components/**/*Modal*.tsx
+paths:
+  - "screens/**/*.tsx"
+  - "components/**/*Modal*.tsx"
 ---
 
 # Modals — `DsModal` vs `DsModalFullScreen`

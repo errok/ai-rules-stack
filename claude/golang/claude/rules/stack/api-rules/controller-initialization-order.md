@@ -1,7 +1,9 @@
 ---
 title: Controller dependencies — composition root
 description: Controllers are structs holding their dependencies, built once in router.InitializeRouter after the DB connects (composition root) and injected; no package-level var New(), no per-request construction; field order application → services → external clients.
-globs: controllers/**/*.go,router/**/*.go
+paths:
+  - "controllers/**/*.go"
+  - "router/**/*.go"
 ---
 
 # Controller dependencies — built once at startup, injected

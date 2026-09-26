@@ -1,6 +1,11 @@
 ---
 description: CTRLogger SRCLogger commons/helpers; controllers services application middleware infrastructure; router uses LoggerMiddleware only.
-globs: controllers/**/*.go,services/**/*.go,application/**/*.go,middleware/**/*.go,infrastructure/**/*.go
+paths:
+  - "controllers/**/*.go"
+  - "services/**/*.go"
+  - "application/**/*.go"
+  - "middleware/**/*.go"
+  - "infrastructure/**/*.go"
 ---
 
 # Logging

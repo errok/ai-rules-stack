@@ -1,6 +1,8 @@
 ---
 description: GORM table mirrors database/model database/db.go Init connection RunInTx FromContext transaction in context; entity files GORM tags no JSON; init.sql for schema bootstrap.
-globs: database/db.go,database/model/**/*.go
+paths:
+  - "database/db.go"
+  - "database/model/**/*.go"
 ---
 
 # Database — Models & Connection
@@ -19,13 +21,13 @@ globs: database/db.go,database/model/**/*.go
 
 ```go
 // ✅ catalogue
-type SessionType struct {
+type OrderType struct {
   ID   int    `gorm:"type:int;primaryKey;autoIncrement"`
   Code string `gorm:"type:text;not null"`
 }
 
 // ✅ entity (uuid) — see also table-naming for *_instance
-type Member struct {
+type Account struct {
   ID     uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
   Handle string    `gorm:"type:text;not null"`
 }
@@ -49,9 +51,3 @@ type Member struct {
 ## Schema bootstrap
 - Initial schema via `database/init.sql` (idempotent SQL script)
 - No AutoMigrate in production — migrations are managed explicitly
-
-## Naming
-- Tables: singular `snake_case` (`user`, `order_line`) — taxonomy in `table-naming.md`
-- Columns: `snake_case` (`created_at`, `user_id`)
-- Structs: `PascalCase`
-- Fields: `PascalCase` (`ID`, `CreatedAt`, `UserID`)

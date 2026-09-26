@@ -1,7 +1,11 @@
 ---
 description: useEffect no inline async anonymous function declare loader Init Callbacks useCallback dependency array screens components React Native.
-globs: components/**/*.ts,components/**/*.tsx,screens/**/*.tsx
+paths:
+  - "components/**/*.ts"
+  - "components/**/*.tsx"
+  - "screens/**/*.tsx"
 ---
+
 # `useEffect` — no inline functions
 
 ## Rule

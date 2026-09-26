@@ -1,6 +1,7 @@
 ---
 description: Environment variables ENV dev staging prod config db logger startup; Viper; no hardcoded secrets.
-globs: config/**/*.go
+paths:
+  - "config/**/*.go"
 ---
 
 # Configuration & Environment
@@ -13,34 +14,11 @@ globs: config/**/*.go
 - Auth config centralized: `SUPABASE_URL` (default IdP)
 - Access config via the centralized `config` package — avoid scattered `os.Getenv()` outside `config/`
 
-## Available environment variables
-```env
-PORT=8080
-ENVIRONMENT=development
-DEBUG=true
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=
-DB_NAME=
-DB_SSLMODE=disable
-
-SUPABASE_URL=https://<project>.supabase.co
-
-LOG_LEVEL=INFO
-LOG_COLORS=false
-LOG_*_LEVEL=
-DISABLE_DEBUG_LOGS=
-GIN_MODE=release
-```
-
 ## Config structure
 - Prefer typed sub-configs: `AppConfig`, `DbConfiguration`, `LoggerConfig`
 - Expose accessors: `DBConfig()`, `LoggerCfg()`, `AppCfg()`
-- Keep `config/.example.env` in sync when adding env vars
 
 ## Rules
 - Never commit `.env` files with real values
-- Prefer **`config/.example.env`** with all keys and placeholder values
+- **`config/.example.env`** lists every key with placeholder values — keep it in sync when adding env vars
 - Fix naming consistency between `.example.env` and `config.go` (same key names everywhere)

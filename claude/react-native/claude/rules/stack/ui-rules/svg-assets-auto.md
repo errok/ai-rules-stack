@@ -1,6 +1,7 @@
 ---
 description: assets SVG icons — root svg color fallback black, stroke fill currentColor, tint from RN color prop; avoid duplicate white/black glyphs.
-globs: assets/**/*.svg
+paths:
+  - "assets/**/*.svg"
 ---
 
 # SVG assets

@@ -18,34 +18,10 @@ description: Analyzes recent changes and conversation to create or update .claud
 
 ---
 
-## 0. Git commands in the agent terminal (required)
+## 0. Git commands
 
-The integrated agent shell often starts with **`cwd` outside this repo** (e.g. `/private/tmp`). Plain `git rev-parse` / `git log` then fail with “not a git repository”, and `cd <repo> && git …` can fail under sandbox.
-
-**Always** run Git **one** of these ways:
-
-1. **Preferred:** use the terminal tool with **`working_directory`** set to **this repository root** (the folder that contains `.git`).
-2. **Alternative:** use an explicit Git tree:  
-   `git -C /absolute/path/to/repo <subcommand>`  
-   (use the real absolute path to this repo on the machine).
-
-Examples (after choosing 1 or 2):
-
-```bash
-git rev-parse --verify "${ANCHOR}^{commit}" 2>/dev/null
-git merge-base --is-ancestor "${ANCHOR}" HEAD
-git log "${ANCHOR}..HEAD" --oneline
-git diff "${ANCHOR}..HEAD" --stat
-```
-
-Bootstrap / fallback (no usable anchor):
-
-```bash
-git log -12 --oneline
-git diff HEAD~10..HEAD --stat
-```
-
-Do **not** assume the shell already `cd`’d into the repo.
+Run Git against this repository — from its root, or with `git -C <repo root> …`. Do not assume the
+shell's working directory is the repo.
 
 ---
 
@@ -76,15 +52,10 @@ From the **diff / log** from §1 **and** the session context:
 - spot recurring patterns, new conventions, architectural decisions;
 - scan `.claude/rules/` to avoid duplicates.
 
-### 2.1 Rule frontmatter (`globs`)
+### 2.1 Rule frontmatter
 
-When creating or updating `.claude/rules/**/*.md` YAML frontmatter:
-
-- Write **`globs` values without surrounding double quotes**.
-  - **Correct:** `globs: database/model/**/*.go` or `globs: controllers/**/*.go,router/**`
-  - **Wrong:** `globs: "database/model/**/*.go"`
-
-(See also `core-rules/rule-manager-agent.md` and the `optimize-rule-attachment` command.)
+Scoped rules carry a `paths:` YAML list of quoted globs; always-on rules have none. See the
+rule-manager rule (`core-rules/rule-manager-agent.md`).
 
 ---
 
@@ -92,9 +63,8 @@ When creating or updating `.claude/rules/**/*.md` YAML frontmatter:
 
 For each pattern:
 
-- coding convention → create / update a rule under `.claude/rules/` with an accurate
-  `globs:` line (always-on rules are `@`-imported by `CLAUDE.md` instead — see
-  `core-rules/rule-manager-agent.md`)
+- coding convention → create / update a rule under `.claude/rules/` with accurate `paths:`
+  (none for an always-on rule)
 - repeatable multi-step procedure → skill under `.claude/skills/`
 - workflow → command under `.claude/commands/`
 
@@ -106,7 +76,7 @@ Respect **`.claude/` language policy** above for every file under `.claude/`.
 
 **4.1** **Report (chat):** what was created or changed + which scope was analyzed (`<ANCHOR>..HEAD` or bootstrap). Language: see **`.claude/` language policy** (French allowed for chat only).
 
-**4.2** If the run completes (analysis + updates done), **refresh the anchor** for the next run — still using **§0** (correct `working_directory` or `git -C`):
+**4.2** If the run completes (analysis + updates done), **refresh the anchor** for the next run — still following **§0**:
 
 ```bash
 git rev-parse HEAD > .claude/gitanchor

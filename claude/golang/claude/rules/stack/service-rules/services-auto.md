@@ -1,6 +1,7 @@
 ---
 description: GORM services domain mapper Service struct; level-1 services must not import each other (orchestrate in application); database.FromContext ctx transaction; gorm.ErrRecordNotFound translated into Err*NotFound sentinels; external API clients see external-api-clients.
-globs: services/**/*.go
+paths:
+  - "services/**/*.go"
 ---
 
 # Services — Business Logic Layer
@@ -63,6 +64,10 @@ if err := db.Where(...).Where(...).First(&model).Error; err != nil { ... }
 ```
 
 - Prefer GORM `Preload`/`Joins` over manual joins when relations are declared on models
+
+## Ownership scoping and SQL safety
+- For user- or tenant-scoped data, every read/write constrains rows to the current user/tenant from context (`Where("user_id = ?", userID)`) — never trust an ID from the client alone. Catalogue / public tables have no owner key but still need the right checks (auth, role, flags). Assume data is scoped unless it is confirmed public.
+- No string concatenation for SQL values — parameterized GORM queries only (`Where("id = ?", id)`).
 
 ## Queries — context and transaction
 - Start every query from **`database.FromContext(ctx, s.db)`**: it returns the caller's transaction when `ctx` carries one, else `s.db` bound to `ctx`. Never a bare `s.db` or `s.db.WithContext(ctx)`, and no `WithTx(tx)` constructor.

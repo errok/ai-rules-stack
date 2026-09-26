@@ -1,7 +1,9 @@
 ---
 description: Screens (screens/) must own try/catch and user-facing error UX (no try/catch in services).
-globs: screens/**/*.tsx
+paths:
+  - "screens/**/*.tsx"
 ---
+
 # Screens — Error handling (controllers)
 
 ## Principle

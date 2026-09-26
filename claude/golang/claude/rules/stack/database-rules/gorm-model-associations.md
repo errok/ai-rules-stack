@@ -1,6 +1,7 @@
 ---
 description: GORM FK associations — each XxxID has a matching relation field for Preload/Joins
-globs: database/model/**/*.go
+paths:
+  - "database/model/**/*.go"
 ---
 
 # Database — GORM model associations

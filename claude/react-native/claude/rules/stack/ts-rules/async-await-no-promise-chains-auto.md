@@ -1,7 +1,13 @@
 ---
 description: async await try catch finally avoid Promise then catch finally hooks services stores screens components loaders Main App utils.
-globs: hooks/**/*.ts,services/**/*.ts,stores/**/*.ts,screens/**/*.tsx,components/**/*.tsx,utils/**/*.ts
+paths:
+  - "hooks/**/*.ts"
+  - "services/**/*.ts"
+  - "screens/**/*.tsx"
+  - "components/**/*.tsx"
+  - "utils/**/*.ts"
 ---
+
 # Async / await — no Promise chains
 
 ## Rule

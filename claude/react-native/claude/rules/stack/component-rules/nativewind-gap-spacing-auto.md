@@ -1,6 +1,8 @@
 ---
 description: NativeWind v4 spacing — gap-* on flex parent, limit child margins (mt/mb/ml/mr), never space-x space-y
-globs: components/**/*.tsx,screens/**/*.tsx
+paths:
+  - "components/**/*.tsx"
+  - "screens/**/*.tsx"
 ---
 
 # NativeWind spacing — `gap-*` on parent, margins sparingly
@@ -23,7 +25,7 @@ globs: components/**/*.tsx,screens/**/*.tsx
 
 - **Outer inset** from a screen/section edge (`mt-4` on a block below the header) when it is not spacing between siblings in the same stack.
 - **Component-internal** padding/margin that is part of the component contract (e.g. icon inset inside a chip), not layout between arbitrary siblings.
-- **Nested edge case** where `gap` misbehaves — explicit `mb-*` / `mr-*` on a child as a last resort (see Fallback).
+- **Nested edge case** where `gap` misbehaves — explicit `mb-*` / `mr-*` on a child as a last resort.
 
 ## Examples
 
@@ -72,7 +74,3 @@ globs: components/**/*.tsx,screens/**/*.tsx
   <DsButton … />
 </View>
 ```
-
-### Fallback
-
-Explicit `mb-*` / `mr-*` on a child only if `gap` misbehaves in a nested edge case.

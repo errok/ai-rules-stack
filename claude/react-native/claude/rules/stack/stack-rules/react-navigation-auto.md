@@ -1,6 +1,7 @@
 ---
 description: React Navigation navigation/ param lists route enums native-stack bottom tabs mirror existing *.types.ts files.
-globs: navigation/**
+paths:
+  - "navigation/**"
 ---
 
 # React Navigation — `navigation/`
@@ -39,7 +40,6 @@ navigation/public/
   public.types.ts
 ```
 
-- **File name = exported symbol** for stack components (`HomeStack.tsx` → `HomeStack`).
 - Types file: `{section}.types.ts` in the same folder (`home.types.ts`, `settings.types.ts`).
 
 ## Per-stack types file (`{section}.types.ts`)
@@ -81,7 +81,3 @@ export function HomeStack() {
 
 - Adding/renaming a screen → update `{section}.types.ts`, `{Name}Stack.tsx`, redirect switch if any.
 - Keep `types/navigation.ts` re-exports aligned with `{section}.types.ts` paths.
-
-## Screens vs stack types
-
-- Non-trivial params on the screen file (`T*ScreenParams`); stack types file imports them into `T*StackParamList`.

@@ -1,65 +1,54 @@
 ---
-description: Tune .claude/rules globs and descriptions so scoped context stays small and rules stay reusable
+description: Tune .claude/rules paths and content so each conversation loads as little context as possible
 ---
 
-# Optimize rule attachment (globs + descriptions)
+# Optimize rule attachment
 
-Use this when refactoring `.claude/rules/`. Attachment works like this:
+Use this when refactoring `.claude/rules/`. How Claude Code loads rules:
 
-- always-on rules are `@`-imported by `CLAUDE.md` (their `globs:` line is empty);
-- every scoped rule carries a `globs:` line; the `PreToolUse` hook
-  `.claude/hooks/inject-rules.mjs` injects it before an `Edit`/`Write` to a
-  matching file (once per session). `globs:` is the only index: `CLAUDE.md` and
-  `STACK.md` do not list scoped rules.
+- a rule **without** `paths:` frontmatter is loaded in every conversation (always-on);
+- a rule **with** `paths:` is loaded when Claude reads a file matching one of its globs;
+- `paths:` is the only frontmatter key Claude Code reads (`description` is for humans).
 
-Goal: the always-on set stays minimal, each scoped rule has a tight, accurate
-`globs:` and a keyword-rich `description`.
-
-Work from the **target repository root**. This stack uses a **flat layout at repo
-root** (`controllers/`, `services/`, `router/`, `database/model/`, …) — globs and
-paths must **not** reference an `app/` wrapper folder.
+Goal: the always-on set stays minimal, each scoped rule has tight, accurate `paths:`, and no
+guidance is stated twice in files that load together. Work from the target repository root;
+paths are repo-relative.
 
 ---
 
 ## What "good" looks like
 
-1. **Always-on set is small** — only `project-architecture-always.md`. Everything
-   else is scoped.
-2. **`globs`** — smallest subtree where the rule matters
-   (`application/**/*.go`, `services/**/client.go`, `database/model/**/*.go`), not
-   blanket `**/*.go` unless truly universal. Some overlap is fine when it keeps a
-   rule discoverable.
-3. **`description`, body, examples, cross-references** — as generic as possible so
-   the rule forks into another project with minimal search-replace.
-   - No one-off filenames or business-only paths in prose.
-   - Prefer concepts/roles: “level-1 service”, “application orchestrator”,
-     “external API client”, “auth middleware”.
-   - Placeholder names in examples (`UserDto`, `srvUser`, `order/pricing`).
-   - Cross-reference other rules by **title / category** (“the **Services —
-     business logic** rule under `service-rules/`”), not by filename.
-4. **`globs` YAML** — one unquoted, comma-separated line.
-   - Correct: `globs: controllers/**/*.go,router/**` 
-   - Wrong: `globs: "controllers/**/*.go"` or a quoted YAML list.
+1. **Always-on set is small** — only repo-wide maps (the files `STACK.md` `@`-imports).
+   Everything else is scoped.
+2. **`paths:`** — the smallest subtree where the rule matters, not a blanket `**/*` unless
+   truly universal. A YAML list of quoted globs:
+
+   ```yaml
+   paths:
+     - "services/**/*.go"
+     - "router/router.go"
+   ```
+
+3. **No duplication** — each piece of guidance lives in one file: the one whose `paths:` best
+   match where it applies. Files that load together (always-on + anything, or scoped rules with
+   overlapping `paths:`) must not restate each other.
+4. **Portable body** — placeholder names in examples, concepts over one-off filenames, other
+   rules cross-referenced by title and category, so the rule forks into another project with
+   minimal search-replace.
 
 ---
 
 ## Workflow
 
-1. From the repo root, list `.claude/rules/**/*.md`; read each frontmatter
-   (`description`, `globs`) and note which files `CLAUDE.md` `@`-imports.
-2. Flag overly broad globs, empty `description`s, and `@`-imports in `CLAUDE.md`
-   that point at a missing/renamed file.
-3. For each rule:
-   - Tighten `globs` to the smallest subtree that still covers enforcement.
-   - Rewrite `description` / body toward portable language; drop project-only file
-     references and `.md` cross-links in favour of rule titles + categories.
-4. Confirm the `@`-import list in `CLAUDE.md` / `STACK.md` is exactly the
-   always-on set.
+1. List `.claude/rules/**/*.md`; read each frontmatter and note which files have no `paths:`.
+2. Flag broad `paths:`, `paths:` that match nothing in the repo, and always-on content that only
+   concerns a narrow set of files.
+3. Find guidance repeated across files that load together; keep one copy.
+4. Tighten `paths:`, move narrow always-on content into scoped rules, make bodies portable.
 
 ---
 
 ## Deliverable
 
-- Concrete edits to rule frontmatter/body.
-- Short summary: which globs changed, which rules were merged/split, what was
-  generalised.
+- Concrete edits to rule frontmatter and bodies.
+- Short summary: `paths:` changed, content moved or merged, lines saved at session start.

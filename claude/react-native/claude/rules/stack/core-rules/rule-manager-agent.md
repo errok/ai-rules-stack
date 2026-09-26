@@ -1,22 +1,24 @@
 ---
 description: Apply when the user asks to create, update or delete a Claude rule, skill, or command. Also apply when the user says "remember this", "always do X", "never do Y", or when a recurring pattern is identified that should be codified into .claude/.
-globs:
+paths:
+  - ".claude/**"
+  - "CLAUDE.md"
 ---
 
 # Rule Manager
 
-## File locations
+## Where things go
 
-| Type | Location | Notes |
+| Type | Location | Loaded |
 |---|---|---|
-| Always-on rule | `.claude/rules/stack/core-rules/` (stack) · `.claude/rules/project/` (project) | `@`-imported from `STACK.md` (stack) or `CLAUDE.md` (project) so it is always in context; empty `globs:` line |
-| Scoped rule | `.claude/rules/stack/{category}/` (stack) · `.claude/rules/project/` (project) | Injected by the hook before an `Edit`/`Write` to a file matching its `globs:` (see **Attachment model**) |
-| Skill | `.claude/skills/{name}/SKILL.md` | Model-invoked from its own `description` |
-| Command | `.claude/commands/{name}.md` | Slash command (`/{name}`) |
+| Always-on rule | `.claude/rules/stack/core-rules/` (stack) · `.claude/rules/project/` (project) | No `paths:` frontmatter → in every conversation. Stack ones are also `@`-imported by `STACK.md`, project ones by `CLAUDE.md` |
+| Scoped rule | `.claude/rules/stack/{category}/` (stack) · `.claude/rules/project/` (project) | `paths:` frontmatter → when Claude reads a matching file |
+| Skill | `.claude/skills/{name}/SKILL.md` | Its `description` only, until invoked |
+| Command | `.claude/commands/{name}.md` | Its `description` only, until `/{name}` is run |
 
-Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes.
-New rule files do **not** need a suffix — name them
-`{topic}.md`.
+- Stack rules come from the `ai-rules-stack` submodule: never edit them in a project — change them in `ai-rules-stack`, then `make update-rules` (`make install-rules` after cloning, `make check-rules` to verify).
+- `.claude/settings.json` is a copy of the stack template, not a link: keep it identical.
+- Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes; new files are named `{topic}.md`.
 
 ## Categories
 - `core-rules/` — agent behavior, architecture, global contracts
@@ -28,20 +30,10 @@ New rule files do **not** need a suffix — name them
 - `ui-rules/` — design tokens, Tailwind, SVG, markdown, pictos
 - `auth-rules/` — Supabase auth provider
 
-## Rules
-- Before creating a rule, check if an existing rule already covers the pattern
-- Keep rules concise — no redundancy between rule files
-- Always use English in rule content
+## Writing rules
+- Before creating a rule, check that no existing rule already covers the pattern. Never state the same guidance in two files that load together.
+- Always-on only for true repo-wide maps; everything else is scoped. Never add to `project-architecture-always` unless it is truly global.
+- `paths:` is the only frontmatter key Claude Code reads: a YAML list of quoted globs (`- "services/**/*.go"`). `description` is for humans. Keep `paths:` to the smallest subtree that needs the rule, and re-check every `paths:` after moving folders — a wrong path means the rule never loads.
+- Claude rules link only to Claude rules (`.md`), never to Cursor files (`.mdc`).
+- English only, concise, under ~250 lines per file — split a rule that mixes concerns.
 - After any creation or update, confirm: `✅ .claude/rules/{path}/{file}.md created/updated`
-
-## Rule size guardrails
-- Keep each `.md` file under ~250 lines when possible
-- If a rule grows too large or mixes concerns, propose splitting it into focused rules
-- Prefer a new rule file over piling more into an always-on `core-rules/` file
-
-## Attachment model (Claude Code)
-- **Always-on:** only true repo-wide maps (architecture, naming, no-unrequested-cleanup). `@`-import them in `STACK.md` (project ones in `CLAUDE.md`), and leave their `globs:` line empty so the hook does not double-inject them.
-- **Scoped:** everything else. Give the rule a keyword-rich `description` (topics, folder names, symbols like `DsIcon`, `DsModal`) and a tight `globs:` line (smallest subtree that needs it, unquoted, comma-separated). The `PreToolUse` hook `.claude/hooks/inject-rules.mjs` reads `globs:` and injects the rule before an `Edit`/`Write` to a matching file (once per session). `globs:` is the only rule index — `CLAUDE.md` does not list scoped rules. The user can `@`-mention it explicitly.
-- **`globs:` is load-bearing** — an inaccurate or missing glob means the rule never fires. After renaming/moving folders, re-check every `globs:`.
-- **Overlap** between globs is fine when it keeps a rule discoverable; avoid duplicating the *same* guidance across two files.
-- **This repo has no `src/`** — use root folders (`screens/`, `components/`, `navigation/`, …).

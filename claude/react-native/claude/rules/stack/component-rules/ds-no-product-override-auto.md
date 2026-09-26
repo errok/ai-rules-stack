@@ -1,6 +1,8 @@
 ---
 description: Product apps never fork Ds* primitives or ds/composed — missing API goes to main via /promote-ds; product chrome lives in components/ not components/ds.
-globs: components/ds/**,components/ds/composed/**,components/**/*.tsx,design-tokens/components/**
+paths:
+  - "components/ds/**"
+  - "design-tokens/components/ds/**"
 ---
 
 # Product apps do not override the DS

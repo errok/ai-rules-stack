@@ -1,6 +1,7 @@
 ---
-description: application orchestration New() no gin no gorm; database.RunInTx transaction in ctx; errors.Is on service sentinels; controllers must not wire 2+ level-1 services per handler—use application/<object>; multi-service flows.
-globs: application/**/*.go,controllers/**/*.go
+description: application orchestration New() no gin no gorm; database.RunInTx transaction in ctx; errors.Is on service sentinels; multi-service flows.
+paths:
+  - "application/**/*.go"
 ---
 
 # Application Layer (Orchestration)
@@ -58,15 +59,6 @@ err := database.RunInTx(ctx, func(ctx context.Context) error {
   - call `New()` from a controller constructor, built once in the composition root (see **Controller dependencies — composition root**)
 - Avoid singletons (`Default()`) in the application layer unless there is real shared state/cost.
   - Singletons are acceptable for external API clients when sharing an `http.Client` or caches.
-
-## Controller guidance (HTTP layer)
-- **Do not** wire **multiple level-1 `services/*` dependencies** (or service + external client orchestration) **inside a single handler** — the agent must not add several service fields to the controller just to sequence calls for one endpoint. That logic belongs in `application/<object>`; the controller calls **one** orchestrator (or one service when the flow is truly single-service).
-- Controllers should:
-  - validate/bind requests
-  - call `application/<object>` orchestrators for non-trivial flows
-  - map errors to HTTP responses
-- Rule of thumb: if a controller endpoint needs to call **2+ services** (or a service plus an external client), create an `application/<object>` orchestrator and call that instead of wiring multiple dependencies in the controller.
-- Controllers should avoid embedding non-trivial business rules or algorithms (extract to pure packages under the relevant domain).
 
 ## Related
 - **Service boundaries** (no cross-imports between level-1 `services/*` packages) and **service layer structure** live in the **Services — business logic** rule under `service-rules/`.

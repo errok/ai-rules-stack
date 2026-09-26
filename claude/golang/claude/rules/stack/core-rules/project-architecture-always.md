@@ -1,6 +1,5 @@
 ---
 description: Go module at repo root; Model Service Controller; gin router middleware infrastructure auth Supabase; flat layout — always-on map for the backend.
-globs:
 ---
 
 # Project — Go Backend Architecture
@@ -57,18 +56,3 @@ globs:
 - All code comments in **English** only
 - Document public functions: `// FunctionName does...`
 - No commented-out dead code — delete it
-
-## Method names — CRUD verbs
-Controller handlers, `application/` orchestrators and services name their methods by intent, with the same verbs (not HTTP verbs glued to the resource name):
-
-| Intent | Prefix | Examples |
-|---|---|---|
-| List / collection | `GetList` | `GetList`, `GetListBySession`, `GetListHistory` |
-| Single read | `GetOne` | `GetOne`, `GetOneByID`, `GetOneByExternalID` |
-| Create | `Create` | `Create`, `CreateForSession` |
-| Update (PATCH/PUT) | `Update` | `Update`, `UpdateFavorite` |
-| Delete | `Delete` | `Delete`, `DeleteByID` |
-
-- Suffix with a qualifier when several methods share a verb (`GetListBySession`, `UpdateFavorite`).
-- A method that returns a single logical value but is not a fetch keeps an explicit name (`GetLast…`, `Compute…`) instead of a forced `GetOne`.
-- **Forbidden legacy:** `GETme`, `POSTsession`, `PATCHtargetCard`, `GETmoods`, `ListActive`, etc.

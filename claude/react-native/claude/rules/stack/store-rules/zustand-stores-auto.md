@@ -1,6 +1,7 @@
 ---
 description: Zustand stores/ — create(), T{Name}Store, MMKV persist mmkvStorage, partialize; no HTTP in stores; Supabase session not in Zustand.
-globs: stores/**
+paths:
+  - "stores/**"
 ---
 
 # Zustand Stores — Conventions
@@ -26,7 +27,7 @@ useMyStore.getState().setValue(response.field ?? null);
 ```
 
 ## Structure
-- One file per domain: `useUserStore.ts`, `useThemeStore.ts`
+- One file per domain: `userStore.ts`, `themeStore.ts`
 - State + setters in the same file using `create()` — no slices pattern
 - Actions are inline setter functions passed to `set`
 
@@ -45,12 +46,6 @@ useMyStore.getState().setValue(response.field ?? null);
 
 ## Logout / reset global
 - When adding or renaming a store that holds user-scoped state, **always** add a corresponding clear/reset call in `stores/utils/clearStores.ts` so logout clears all relevant stores consistently.
-
-## Naming
-- Store state type: prefix **`T`** — `TUserStore`, `TThemeStore`
-- Enums used in stores: prefix **`E`**
-- Store hook: `use{Domain}Store`
-- File: `camelCase.ts` (`useUserStore.ts`, `useThemeStore.ts`)
 
 ## Boolean UI flags (visibility, expanded, etc.)
 - Prefer **explicit intent** actions: `showMenu()` / `hideMenu()` (and optionally `toggleMenu()`).

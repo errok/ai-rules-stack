@@ -1,6 +1,8 @@
 ---
 description: DsIcon EDsIconName registry centralized icon component raw SVG assets only when missing from registry IconButton tint size.
-globs: components/**/*.tsx,screens/**/*.tsx
+paths:
+  - "components/**/*.tsx"
+  - "screens/**/*.tsx"
 ---
 
 # Icon Handling — Centralize via `DsIcon`

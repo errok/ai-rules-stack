@@ -1,6 +1,9 @@
 ---
 description: NativeWind tailwind.config primitives semantic component tokens typography blocklist gradients withAlpha design-tokens tailwind dirs, rebrand, importing a design, generic token names, light/dark themes, reverse roles.
-globs: tailwind.config.js,design-tokens/**,tailwind/**
+paths:
+  - "tailwind.config.js"
+  - "design-tokens/**"
+  - "tailwind/**"
 ---
 
 # Design tokens and Tailwind

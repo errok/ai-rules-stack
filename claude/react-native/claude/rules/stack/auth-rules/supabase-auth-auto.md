@@ -1,15 +1,13 @@
 ---
 description: Supabase services/auth — authService barrel only, MMKV session storage, autoRefreshToken, onAuthStateChange; not supabaseAuthService direct import.
-globs: services/auth/**
+paths:
+  - "services/auth/**"
 ---
 
 # Auth — Supabase provider (`services/auth`)
 
-## Entry point
-- Never import `supabaseAuthService` or `providers/supabaseAuth` from screens or other services — use `services/auth/index.ts` (`authService`).
-
 ## Provider selection
-- `AUTH_PROVIDER` env var (default: `supabase`). Add new providers in `services/auth/index.ts` switch — never import concrete providers outside `services/auth/`.
+- `AUTH_PROVIDER` env var (default: `supabase`). Add new providers in the `services/auth/index.ts` switch — concrete providers (`providers/supabaseAuth`, …) are never imported outside `services/auth/`.
 
 ## Session storage
 - Supabase session is persisted via **MMKV** (encrypted) in `services/auth/providers/supabaseAuth.ts` — not in Zustand.
@@ -26,6 +24,3 @@ globs: services/auth/**
 ## Sign-out
 - Centralize logout orchestration in the app shell: `authService.signOut()` then `clearAllStores()` from `stores/utils/clearStores.ts`.
 - Child screens call `onLogout()` from props — do not call `signOut()` again if the parent already handles it.
-
-## HTTP for auth-adjacent calls
-- Use `r` from `utils/fetch.ts` for authenticated API calls — no raw `fetch()`.

@@ -1,14 +1,13 @@
 ---
 description: HTTP r rPublic shared fetch helper no raw fetch Dto types errors bubble to screens hooks stores auth barrel.
-globs: services/**
+paths:
+  - "services/**"
 ---
 
 # Services — HTTP Layer Conventions
 
 ## HTTP client
-- Always use the `r` helper from `utils/fetch.ts` for **authenticated** API calls — never raw `fetch()`.
-- `r` handles auth headers, platform info, timeout (45s), and one retry after 401.
-- For **public** endpoints (no JWT), use **`rPublic`** from `utils/fetch.ts` instead of `r`.
+- `r` adds the auth header, platform info, a 45s timeout, caller cancellation via `AbortSignal` and one retry after 401 — never re-implement any of it in a service.
 
 ## Error handling
 - **No try/catch in `services/**`**: let errors from `r()` bubble up.
@@ -33,7 +32,6 @@ const getUserMe = async (): Promise<MeDto> => {
 ```
 
 ## Typing
-- HTTP response types must be suffixed with `Dto` (`MeDto`, `HelloResponseDto`)
 - No runtime validation (no Zod) — TypeScript types only for API responses
 - Define DTOs in the service file or a co-located `*Types.ts` file
 
@@ -41,7 +39,7 @@ const getUserMe = async (): Promise<MeDto> => {
 - Mirror the **exact type names** and JSON field names from the target backend API.
 - Optional fields: reflect backend `omitempty` / optional semantics with `?` in TypeScript.
 - **Backend is source of truth** for wire contracts; update front service types when API DTOs change.
-- Do **not** use `T…` prefixes or ad-hoc aliases for HTTP payloads.
+- No ad-hoc front-only aliases for HTTP payloads.
 
 ## Endpoints
 - Prefer a stable `baseEndPoint` per domain and append the path in each function.
@@ -54,10 +52,6 @@ export const getMe = async (): Promise<MeDto> => {
   return await r<MeDto>({ url: baseEndPoint, method: 'GET' });
 };
 ```
-
-## Auth
-- Never import a concrete auth provider — always use `services/auth/index.ts`
-- Token retrieval: `authService.getIdToken()` (already handled by `r`, don't duplicate)
 
 ## File naming
 - `camelCase.ts` or domain folder (`api/me.ts`, `auth/index.ts`)

@@ -1,6 +1,8 @@
 ---
 description: gin handlers DTO mapper HTTP router registration /api/v1 public nested resources sealed controller roots errors.Is sentinels HTTP 400 401 404 controllers/v1.
-globs: controllers/**/*.go,router/**/*.go
+paths:
+  - "controllers/**/*.go"
+  - "router/**/*.go"
 ---
 
 # API — Controllers & Router
@@ -8,7 +10,7 @@ globs: controllers/**/*.go,router/**/*.go
 ## Controller layout
 - Versioned API handlers: `controllers/v1/<resource>/` with `*_dto.go`, `*_request.go` (when inputs exist), `*_mapper.go`, `<resource>.go`
 - Cross-cutting controllers: `controllers/health/`, `controllers/common/`
-- **Nested resources (URL owns the tree):** a route under `/parent/:id/child` lives in the **parent** controller package as a subfolder with the same file pattern — e.g. `GET /sessions/:id/target-cards` → `controllers/v1/session/targetcard/` (not `controllers/v1/targetcard/` alone). Do **not** register nested parent URL handlers on the child's top-level controller just because the child owns the domain table.
+- **Nested resources (URL owns the tree):** a route under `/parent/:id/child` lives in the **parent** controller package as a subfolder with the same file pattern — e.g. `GET /orders/:id/lines` → `controllers/v1/order/line/` (not `controllers/v1/line/` alone). Do **not** register nested parent URL handlers on the child's top-level controller just because the child owns the domain table.
 - **Controller roots are sealed** (same rule as level-1 services): each package directly under `controllers/v1/` is a controller root.
   - A root **never** imports another root — no sibling DTO, request, mapper or handler (`controllers/v1/order/line` must not import `controllers/v1/product`).
   - **Inside** one root, subpackages may import the root and each other (`controllers/v1/order/line` may use `controllers/v1/order`).
@@ -30,7 +32,8 @@ globs: controllers/**/*.go,router/**/*.go
 ## Strict separation
 - DTOs: JSON only, no GORM tags, not mixed with request structs
 - Requests: validation tags where applicable
-- Controllers: bind → validate → call service → **map via mapper** → HTTP status
+- Controllers: bind → validate → call **one** orchestrator (or one service for a single-service flow) → **map via mapper** → HTTP status
+- A handler never sequences 2+ services (or a service plus an external client) — that flow belongs in `application/<object>`. No business rules or algorithms in handlers.
 - **No DTO construction in controllers**: controllers must not build DTO slices/structs inline; always delegate to `*_mapper.go`
 
 ## Mappers (`*_mapper.go`) — service import + domain alias
@@ -46,17 +49,6 @@ import srvUser "github.com/daystram/go-gin-gorm-boilerplate/services/user"
 type UserDomain = srvUser.UserDomain
 
 func ToUserDto(domain UserDomain) UserDto { ... }
-
-// [name].go
-import srvUser "github.com/daystram/go-gin-gorm-boilerplate/services/user"
-
-type Controller struct {
-	users *srvUser.UserService
-}
-
-func NewController() *Controller {
-	return &Controller{users: srvUser.NewUserService()}
-}
 ```
 
 - Do **not** use lowercase-only aliases (`srvuser`) or `{resource}Service` as the **package** import alias.
@@ -72,7 +64,7 @@ func NewController() *Controller {
 
 ### Route groups (mandatory)
 - **One** `v1route.Group("/resource")` **per top-level resource** (same pattern as `/me`).
-- Sort those groups **alphabetically** by path (`/me` → `/moods` → `/session-types` → `/sessions` → …).
+- Sort those groups **alphabetically** by path (`/me` → `/orders` → `/products` → …).
 - Register nested segments on the group as relative paths: `""`, `/:id`, `/:id/child`.
 - URL-nested children stay on the **parent** group and are handled by the **parent** controller tree (see nested resources above).
 
@@ -80,11 +72,13 @@ func NewController() *Controller {
 - Success: return DTO / payload as defined by the handler
 - Use `helpers.AbortWithError`, `helpers.ResponseJSON`, or `helpers.ShouldBindJSON` for consistent error shapes (error envelope lives in `commons/helpers`, not a top-level `datatransfers/` package)
 - Map errors to status codes with `errors.Is` on the sentinels the orchestrator or service exports (`errors.Is(err, appOrder.ErrOrderNotFound)` → 404) — never `err == …`, never a `gorm` error
+- Validate all external input before business logic (`helpers.ShouldBindJSON` gives field-level errors)
 - Errors: appropriate HTTP codes with clear messages
-  - **400** — validation / bad input
+  - **400** — validation / bad input; field-level messages when safe for the client
   - **401** — missing or invalid JWT
+  - **403** — forbidden (if used)
   - **404** — not found
-  - **500** — internal error (no stack trace to client; generic message only — see `security-rules/security-auto.md`)
+  - **500** — internal error: log with `CTRLogger`, return a generic message — **never** `err.Error()`, an upstream API `detail` or a stack trace
 
 ## Context helpers
 - Use `controllers/common/GetUserContextOrAbort(c, caller)` to extract authenticated user context — do not re-parse JWT in handlers

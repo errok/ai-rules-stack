@@ -1,6 +1,8 @@
 ---
 description: handlePress handleClose handleSubmit handleOpen useCallback JSX onPress onClose event handler naming handle prefix screens components.
-globs: components/**/*.tsx,screens/**/*.tsx
+paths:
+  - "components/**/*.tsx"
+  - "screens/**/*.tsx"
 ---
 
 # Callback Naming — `handle` Prefix

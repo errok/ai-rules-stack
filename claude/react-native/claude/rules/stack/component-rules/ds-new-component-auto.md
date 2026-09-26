@@ -1,6 +1,9 @@
 ---
 description: Checklist new Ds* component — tokens primitive→semantic→component, isolated tabs.js-style module, no hex, DevDebugMenu lab, barrel exports.
-globs: components/ds/**,design-tokens/components/**,components/DevDebugMenu/**
+paths:
+  - "components/ds/**"
+  - "design-tokens/components/**"
+  - "components/_devDebugMenu/ds/**"
 ---
 
 # New design-system component — checklist
@@ -16,8 +19,6 @@ Related: **Design tokens & Tailwind** (`ui-rules/`), **Naming** (core), **Compon
 | DS primitive | `components/ds/Ds{Name}.tsx` | `Ds{Name}` |
 | DS composed | `components/ds/composed/Ds{Name}.tsx` (or subfolder) | `Ds{Name}` |
 | Props type | same file | `TDs{Name}Props` |
-
-**File name = exported symbol.** No `Screen` suffix on components.
 
 ## 2. Token hierarchy (mandatory)
 
@@ -77,29 +78,22 @@ module.exports = { light, dark: {} };
 - Export component + types from `components/ds/index.ts`.
 - Composed components also from `components/ds/composed/index.ts`.
 
-## 6. DevDebugMenu lab (required for new `Ds*`)
+## 6. Debug menu lab (required for new `Ds*`)
 
 Mirror an existing lab (`DsChipDebug`, `DsTabsDebug`, …):
 
 ```
-components/DevDebugMenu/ds/Ds{Name}/
+components/_devDebugMenu/ds/Ds{Name}/
   Ds{Name}Debug.tsx
   ds{Name}DebugSnippet.ts   # buildSnippet + describeProps for copy
 ```
 
-Wire in `components/DevDebugMenu/DevDebugMenu.tsx`:
+Wire in `components/_devDebugMenu/DsCatalog.tsx`:
 
 - `DebugCatalogRow` in **Primitives** or **Composed**
 - state + `DsModalFullScreen` + close/hide callbacks
 
 **Token-only modules** (no `Ds*` wrapper, e.g. `activityIndicator.js`): lab documents the token + lists DS consumers (`DsButton` loading, …).
 
-To land `Ds*` + labs from a product branch onto stack `main`, use **`/promote-ds`**. Do not dump app widgets. **Do not keep product forks of `components/ds/**` (primitives or composed)** — missing API goes to `main`; product style goes to `components/`, not a new composed `Ds*` (see **Product apps do not override the DS**).
+To land `Ds*` + labs from a product branch onto stack `main`, use **`/promote-ds`** — do not dump app widgets.
 
-## 7. Quick validation before PR
-
-- [ ] Component token → semantic → primitive chain intact
-- [ ] No hex in component or component token files
-- [ ] Isolated `design-tokens/components/ds/{name}.js` or `ds/composed/{name}.js` (not duplicated in `colors.js`)
-- [ ] Barrel exports updated
-- [ ] DevDebugMenu entry + simulator works in `__DEV__`

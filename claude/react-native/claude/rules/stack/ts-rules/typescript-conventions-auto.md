@@ -1,6 +1,8 @@
 ---
 description: TypeScript strict type not interface import type no any Biome organizeImports legacy I* TSX screens components navigators.
-globs: **/*.ts,**/*.tsx
+paths:
+  - "**/*.ts"
+  - "**/*.tsx"
 ---
 
 # TypeScript Conventions

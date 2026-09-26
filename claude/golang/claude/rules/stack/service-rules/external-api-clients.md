@@ -1,7 +1,10 @@
 ---
 title: External API Clients (non-DB services)
 description: services external HTTP client PostJSON DefaultClient sync.Once context AttachBearer authctx logging; not pure subpackages.
-globs: services/**/client.go,services/**/authctx.go,services/**/http_client.go
+paths:
+  - "services/**/client.go"
+  - "services/**/authctx.go"
+  - "services/**/http_client.go"
 ---
 
 # External API Clients (non-DB services)
@@ -37,13 +40,10 @@ Some code under `services/` is not business logic backed by GORM. It is an **ext
 - Prefer `*WithContext` methods so cancellation and bearer forwarding work.
 
 ## Bearer forwarding (internal services only)
-- Use `AttachBearer(ctx, rawToken)` in `authctx.go` with a **private** context key type.
-- Only the client package can read the token back — see `security-rules/security-auto.md` for trust-boundary constraints.
+- `AttachBearer(ctx, rawToken)` in `authctx.go` — trust-boundary constraints in `security-rules/security-auto.md`.
 
 ## Logging
-- Use `helpers.SRCLogger` inside the client/services for request/parse errors.
 - Log outbound **request bodies at DEBUG only** — payloads may contain PII; never INFO log full JSON bodies.
-- Controllers should log at `helpers.CTRLogger` when mapping errors to HTTP responses.
 
 ## Context
 - Accept `context.Context` on endpoint methods and pass it through `http.NewRequestWithContext`.

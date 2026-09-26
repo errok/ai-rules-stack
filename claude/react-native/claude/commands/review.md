@@ -21,11 +21,11 @@ If the diff is clean and aligned: say so plainly — **no forced nitpicks** to p
    - If the diff is empty: report that and stop.
 
 2. **Pick relevant rules**
-   - Read at least the workspace **always-applied** rules (e.g. architecture, naming).
-   - For each area touched by the diff, open rules whose **globs** or **description** match (`component-rules/`, `service-rules/`, `store-rules/`, `ts-rules/`, etc.) — stay proportional to the diff; do not load everything blindly.
+   - Always-on rules are already in context.
+   - For each area touched by the diff, open the scoped rules whose `paths:` match the changed files (`component-rules/`, `service-rules/`, `store-rules/`, `ts-rules/`, etc.) — stay proportional to the diff; do not load everything blindly.
 
 3. **Analyze the diff**
-   - Project patterns (AppNative vs raw RN, `r` / fetch, auth, stores, `Screen` / `Dto` / `T` / `E` suffixes, etc.).
+   - Project patterns (`Ds*` vs raw RN, `r` / fetch, auth, stores, `Screen` / `Dto` / `T` / `E` suffixes, etc.).
    - Consistency with existing files (style, imports, structure).
    - Obvious regression risks (public API, navigation, Tailwind tokens / `tailwind.config`, env).
    - **Do not** invent minor or subjective issues if nothing violates the rules or repo consistency.

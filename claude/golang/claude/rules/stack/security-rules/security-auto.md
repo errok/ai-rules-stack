@@ -1,6 +1,11 @@
 ---
 description: JWT bearer middleware AuthCheck EnsureUserExists Supabase infrastructure auth; BodySizeLimit gzip Recovery; pluggable IdP registry.
-globs: middleware/**/*.go,infrastructure/**/*.go,services/**/authctx.go,services/**/client.go
+paths:
+  - "middleware/**/*.go"
+  - "infrastructure/**/*.go"
+  - "router/router.go"
+  - "main.go"
+  - "services/**/authctx.go"
 ---
 
 # Security & Middleware
@@ -42,10 +47,9 @@ Global stack (before groups) includes:
 
 ## Supabase token validation (infrastructure)
 - Validate signature via JWKS fetched from `{SUPABASE_URL}/auth/v1/.well-known/jwks.json`
-- Cache JWKS in-memory with periodic refresh (see `middleware/jwks_cache.go` or `infrastructure/auth/provider/`)
+- Cache JWKS in-memory with periodic refresh (`infrastructure/auth/provider/jwks_cache.go`)
 - Verify `iss`, `exp`, and audience as required by Supabase
 - `extractBearerToken` must require the **`Bearer`** scheme (`strings.EqualFold` on the scheme part)
-- JWKS fetch uses a bounded `http.Client` timeout in all environments
 
 ## Internal API — forwarding the end-user JWT (optional pattern)
 - After successful JWT validation, `middleware.AuthCheck()` may attach the **raw bearer string** to `c.Request.Context()` via a private context key in the outbound client package (e.g. `AttachBearer` in `services/<api>/authctx.go`).
@@ -55,32 +59,5 @@ Global stack (before groups) includes:
 ## Context
 - User data is read from gin context set by middleware — use `controllers/common/` helpers and `middleware/context.go` instead of duplicating claims parsing in controllers
 
-## Tenant / ownership scoping (when applicable)
-- For **user-scoped** or **tenant-scoped** data, every read/write query must **constrain rows to the current user/tenant** from context — never rely on an ID from the client alone.
-- Typical pattern in services: add an explicit GORM condition on the ownership foreign key:
-
-```go
-Where("user_id = ?", userID)
-```
-
-- **Reference / global** tables (catalogs, public config, etc.) may not have an ownership key — still apply the right checks (auth, role, feature flags).
-- **Default mindset:** assume data must be scoped unless you have confirmed it is intentionally public.
-
-## Input validation
-- Validate all external input before business logic
-- Use `helpers.ShouldBindJSON` for structured field-level validation errors
-- Return **400** with usable field-level detail when validation fails
-- Never trust client IDs without authorization checks in the **service** layer
-
-## SQL injection
-- No string concatenation for SQL values
-- Use GORM parameterized queries: `db.Where("id = ?", id)`
-
 ## Error responses
-- **400** — validation
-- **401** — auth
-- **403** — forbidden (if used)
-- **404** — not found
-- **500** — internal (no stack traces to clients)
-- **Never** return `err.Error()` or upstream API `detail` strings in **500** JSON bodies — log with `CTRLogger` / `SRCLogger` and return a generic message (e.g. `"internal server error"`).
-- **400** may still return field-level validation messages when safe for the client.
+- Middleware aborts follow the HTTP responses of the **API — Controllers & Router** rule: generic message on a 500, never `err.Error()`.
