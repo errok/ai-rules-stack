@@ -48,10 +48,6 @@ i18n/              # Localization
 assets/            # Static resources
 ```
 
-## Data flow
-Expo entry → `App.tsx` → navigators → screens → components + hooks → services ↔ stores
-theme / types / utils: transversal
-
 ## Stores vs hooks
 - **Stores** (`stores/`): shared state + synchronous setters only — **never** import `services/**` or fetch inside a store (see **Zustand stores** rule under `store-rules/`).
 - **Hooks** (`hooks/`): orchestration — call services, then update stores via setters.

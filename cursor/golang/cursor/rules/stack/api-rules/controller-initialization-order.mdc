@@ -15,6 +15,8 @@ alwaysApply: false
   `database.ConnectToDatabase()`.
 - Handlers reach orchestrators / services **through the struct fields** — never by calling a
   constructor themselves.
+- Services may call `database.GetDB()` in their constructor: it now runs after the connection exists.
+  Per-request state (context, transaction) still goes through `ctx`, never through the controller struct.
 - Declare fields and build them in this order, for readability:
   1. **Application orchestrators** (`application/...`)
   2. **Level-1 services** (`services/...`)
@@ -54,12 +56,3 @@ v1route.GET("/orders", middleware.RequireAuth(), orderController.GetList)
 - **Building dependencies inside a handler** (`appOrder.New()` on every request). It hides what the
   controller depends on, allocates the whole graph per request, and leaves no seam to swap a
   dependency in tests.
-
-## Why
-
-- One place (`InitializeRouter`) shows the whole dependency graph, built in a known order after
-  the infrastructure it needs.
-- Dependencies are explicit fields: a controller can be built with other implementations in tests.
-- Services may keep taking their connection at construction (`database.GetDB()`), because the
-  constructor now runs after the connection exists. Per-request state (the context, and the
-  transaction it carries) still goes through `ctx`, never through the struct.

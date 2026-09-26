@@ -1,6 +1,6 @@
 ---
 description: NativeWind v4 spacing — gap-* on flex parent, limit child margins (mt/mb/ml/mr), never space-x space-y
-globs: components/**/*.tsx,screens/**/*.tsx
+globs: components/**/*.tsx,screens/**/*.tsx,navigation/**/*.tsx,App.tsx
 alwaysApply: false
 ---
 

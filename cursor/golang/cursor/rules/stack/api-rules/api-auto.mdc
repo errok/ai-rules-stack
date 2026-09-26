@@ -48,15 +48,11 @@ type UserDomain = srvUser.UserDomain
 
 func ToUserDto(domain UserDomain) UserDto { ... }
 
-// [name].go
+// [name].go — same alias on fields. Construct once: **Controller dependencies** rule.
 import srvUser "github.com/daystram/go-gin-gorm-boilerplate/services/user"
 
 type Controller struct {
 	users *srvUser.UserService
-}
-
-func NewController() *Controller {
-	return &Controller{users: srvUser.NewUserService()}
 }
 ```
 

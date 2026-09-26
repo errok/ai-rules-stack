@@ -27,6 +27,3 @@ alwaysApply: false
 ## Sign-out
 - Centralize logout orchestration in the app shell: `authService.signOut()` then `clearAllStores()` from `stores/utils/clearStores.ts`.
 - Child screens call `onLogout()` from props — do not call `signOut()` again if the parent already handles it.
-
-## HTTP for auth-adjacent calls
-- Use `r` from `utils/fetch.ts` for authenticated API calls — no raw `fetch()`.

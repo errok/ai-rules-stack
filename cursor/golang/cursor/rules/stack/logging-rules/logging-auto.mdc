@@ -14,20 +14,12 @@ Full reference: **`LOGGING.md`** at repo root (levels, scopes, `LOG_LEVEL`, `LOG
 - **Auth / DB / Config / HTTP** — use scoped loggers from `commons/helpers` (`AuthLogger`, `DBLogger`, `ConfigLogger`, `HTTPLogger`, etc.)
 - Do **not** use `logrus` or stdlib `log` directly in new code — go through the project helpers
 
-## What to log
-- Log **errors** on all failure paths (HTTP bind errors, service errors, DB errors)
-- Log **important business actions** at INFO when useful (connections, critical state changes)
-- Use **DEBUG** for verbose diagnostics in development
-
-## Levels (guideline)
-- **DEBUG** — development detail (`LOG_LEVEL=DEBUG` or `LOG_SERVICE_LEVEL=DEBUG`, etc.)
-- **INFO** — normal operational events (default `LOG_LEVEL`)
-- **ERROR** — failures requiring attention
-- **LOG_COLORS** — ANSI colors only when enabled; unrelated to log level
-
 ## Content
+- Log **errors** on failure paths (HTTP bind, service, DB) — do not swallow them
+- Log important business actions at INFO (connections, critical state changes)
 - Include enough context to debug (`id`, operation name) — never log secrets, full JWTs, or passwords
 - Prefer structured messages with `%v` for errors after the message
+- ERROR = failures, INFO = operational state changes, DEBUG = diagnostics. Per-scope override: `LOG_*_LEVEL`. `LOG_COLORS` is ANSI only, unrelated to level.
 
 ## Middleware
 - HTTP request/response logging is handled by `middleware.LoggerMiddleware()` — do not duplicate full access logs in every handler

@@ -14,7 +14,7 @@ alwaysApply: true
 - gin-gonic, PostgreSQL via GORM
 - **Auth:** bearer **JWT** validated in **middleware**; provider-specific logic in **`infrastructure/auth`** (pluggable adapter surface). Default implementation: **Supabase** (JWKS ES256).
 - Config via **Viper** + env vars (`config/`)
-- Prefer modern Go patterns; format with gofmt; use gosimple / govet
+- Format with gofmt; lint with gosimple / govet
 
 ## Architecture: DB model → Service → Application (optional) → Controller
 

@@ -15,7 +15,7 @@ alwaysApply: false
   - `TableName()` must stay **schema-qualified**: `"i18n.notification_type"`, etc.
 - GORM tags only — never JSON annotations (models are not returned to the client as API contracts)
 - FK associations: each `XxxID` has a matching relation field — see `gorm-model-associations.mdc`
-- Naming: structs `PascalCase`, fields `PascalCase`, tables/columns `snake_case`
+- Naming: structs and fields `PascalCase` (`ID`, `CreatedAt`, `UserID`); tables singular `snake_case` (`user`, `order_line`); columns `snake_case` (`created_at`, `user_id`). Taxonomy: **table naming** rule.
 - Use `time.Time` for dates
 
 ```go
@@ -43,16 +43,9 @@ type Member struct {
   - `FromContext(ctx, db)` returns the transaction carried by `ctx`, else `db`, bound to `ctx`.
 
 ## Queries
-- Do **not** chain `.Debug()` on GORM builders in services
-- SQL trace is enabled when the **DB** log perimeter is `DEBUG` (`LOG_DB_LEVEL` or `LOG_LEVEL`); see `LOGGING.md`
-- Set appropriate timeouts on DB operations where relevant
+- SQL trace is the DB log perimeter at `DEBUG` (`LOG_DB_LEVEL` or `LOG_LEVEL`); see `LOGGING.md`. Per-query `.Debug()` is banned in the **Services** rule.
 
 ## Schema bootstrap
 - Initial schema via `database/init.sql` (idempotent SQL script)
 - No AutoMigrate in production — migrations are managed explicitly
-## Naming
-- Tables: singular `snake_case` (`user`, `order_line`) — taxonomy in `table-naming.mdc`
-- Columns: `snake_case` (`created_at`, `user_id`)
-- Structs: `PascalCase`
-- Fields: `PascalCase` (`ID`, `CreatedAt`, `UserID`)
 

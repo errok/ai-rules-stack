@@ -66,7 +66,6 @@ err := database.RunInTx(ctx, func(ctx context.Context) error {
   - validate/bind requests
   - call `application/<object>` orchestrators for non-trivial flows
   - map errors to HTTP responses
-- Rule of thumb: if a controller endpoint needs to call **2+ services** (or a service plus an external client), create an `application/<object>` orchestrator and call that instead of wiring multiple dependencies in the controller.
 - Controllers should avoid embedding non-trivial business rules or algorithms (extract to pure packages under the relevant domain).
 
 ## Related

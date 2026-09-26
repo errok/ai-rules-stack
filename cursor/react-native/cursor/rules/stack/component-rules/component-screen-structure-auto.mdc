@@ -5,21 +5,15 @@ alwaysApply: false
 ---
 # Components & Screens — Structure Conventions
 
-## TypeScript (tsx — same contracts as the **TypeScript conventions** rule under `ts-rules/`)
-- Use `type` for data shapes, not `interface` (`useConsistentTypeDefinitions`)
-- `import type` for type-only imports; no `any` (use `unknown` + guards)
-- Full Biome / formatting list lives in the **TypeScript conventions** rule (auto-attached on `.ts` / navigators / typical entry modules)
+`type` vs `interface`, `import type`, and Biome formatting: **TypeScript conventions** (`ts-rules/`) — already attached on these files.
 
 ## File naming
 
-| Type | File name | Exported symbol | Example |
-|---|---|---|---|
-| Screen (nav entry point) | `PascalCase` + suffix `Screen` | Same as file (without `.tsx`) | `HomeScreen.tsx` → `HomeScreen` |
-| Reusable component | `PascalCase` — **no** `Screen` suffix | Same as file (without `.tsx`) | `AvatarRow.tsx` → `AvatarRow` |
-| Local screen sub-component | `PascalCase` — **no** `Screen` suffix (same screen folder) | Same as file (without `.tsx`) | `SettingsRow.tsx` → `SettingsRow` |
-| Hook | `camelCase.ts` starting with `use` | Same as file (without `.ts`) | `useProfile.ts` → `useProfile` |
+Full prefix table: **Naming** (always on). On screens and components the failures to block are:
 
-**Filename = component name.** The primary export must match the file basename (without extension). Do not use a `Screen` suffix on components — reserve it for navigation entry-point screens only.
+- Nav entry: `HomeScreen.tsx` exports `HomeScreen`.
+- Anything else, including files under `screens/`: no `Screen` suffix — `SettingsRow.tsx` exports `SettingsRow`.
+- Filename = exported symbol. `settings.tsx` must not export `SettingsScreen`.
 
 ```tsx
 // ✅ HomeScreen.tsx
@@ -136,7 +130,7 @@ const handlePress = () => {};
 ## Comments
 - Comment only non-obvious logic (intent, constraint, workaround)
 - Comments in English only
-- No commented-out dead code — delete it
+- Commented-out code and TODOs: **No unrequested cleanup** (always on) — do not delete them in passing
 
 ## Pressable vs display cards
 - **`DsCard`** is for **display-only** surfaces — do not add `onPress` / primary tap handling to it.

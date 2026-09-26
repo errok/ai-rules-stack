@@ -7,21 +7,27 @@ alwaysApply: false
 # Rule Manager
 
 ## File locations
-| Type | Location | Naming pattern |
+
+| Type | Location | Naming |
 |---|---|---|
-| Always rule | `.cursor/rules/core-rules/` | `*-always.mdc` |
-| Auto-attached rule | `.cursor/rules/{category}/` | `*-auto.mdc` |
-| Agent-requested rule | `.cursor/rules/{category}/` | `*-agent.mdc` |
-| Manual rule | `.cursor/rules/{category}/` | `*-manual.mdc` |
+| Always rule | `.cursor/rules/stack/core-rules/` (stack) · `.cursor/rules/project/` (project) | `*-always.mdc` |
+| Auto-attached | `.cursor/rules/stack/{category}/` (stack) · `.cursor/rules/project/` (project) | `*-auto.mdc` |
+| Agent-requested | `.cursor/rules/stack/{category}/` (stack) · `.cursor/rules/project/` (project) | `*-agent.mdc` |
 | Skill | `.cursor/skills/{name}/SKILL.md` | — |
 | Command | `.cursor/commands/{name}.md` | — |
+
+Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes.
+New rule files do **not** need a suffix. There is no `*-manual` type.
 
 ## Categories
 - `core-rules/` — agent behavior, architecture, global contracts
 - `ts-rules/` — TypeScript, typing conventions
 - `component-rules/` — components and screens structure
+- `ui-rules/` — tokens, Tailwind, SVG, markdown, spacing, loading-flag names
 - `service-rules/` — HTTP services layer
 - `store-rules/` — Zustand stores and MMKV
+- `auth-rules/` — auth provider
+- `stack-rules/` — navigation
 
 ## Rules
 - Before creating a rule, check if an existing rule already covers the pattern

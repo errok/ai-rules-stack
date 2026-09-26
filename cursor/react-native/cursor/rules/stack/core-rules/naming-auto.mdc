@@ -23,7 +23,7 @@ alwaysApply: true
 | Bottom tab menu | `*Navigator` suffix — **only** for tab bar / menu shell | `BottomTabNavigator.tsx` → `BottomTabNavigator` |
 | Root auth gate | `RootNavigator` | `RootNavigator.tsx` |
 
-**Navigation naming:** `*Navigator` is reserved for the **bottom tab menu** (`BottomTabNavigator`). Domain screen stacks use `*Stack` in `navigation/private/{section}/{Name}Stack.tsx` with co-located `{section}.types.ts`. Do not name domain stacks `*Navigator`.
+Domain stacks: `*Stack` in `navigation/private/{section}/{Name}Stack.tsx` with co-located `{section}.types.ts`. `*Navigator` stays the tab menu only.
 
 **File name = exported symbol** (without extension). Applies to screens and components alike. Only navigation entry-point screens use the `Screen` suffix — never on sub-components, even when they live under `screens/`.
 

@@ -48,10 +48,7 @@ useMyStore.getState().setValue(response.field ?? null);
 - When adding or renaming a store that holds user-scoped state, **always** add a corresponding clear/reset call in `stores/utils/clearStores.ts` so logout clears all relevant stores consistently.
 
 ## Naming
-- Store state type: prefix **`T`** — `TUserStore`, `TThemeStore`
-- Enums used in stores: prefix **`E`**
-- Store hook: `use{Domain}Store`
-- File: `camelCase.ts` (`useUserStore.ts`, `useThemeStore.ts`)
+Hook `use{Domain}Store`, file `use{Domain}Store.ts`, state type `T{Domain}Store` — prefixes are the **Naming** always-rule.
 
 ## Boolean UI flags (visibility, expanded, etc.)
 - Prefer **explicit intent** actions: `showMenu()` / `hideMenu()` (and optionally `toggleMenu()`).

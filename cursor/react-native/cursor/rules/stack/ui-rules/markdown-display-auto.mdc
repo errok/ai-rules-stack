@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Usage
 - Prefer one shared **Markdown** wrapper for rich text; avoid wiring `react-native-markdown-display` directly in many places.
-- The **`reverse`** prop is for **dark** surfaces (high contrast “reverse” ink). On light backgrounds (default app shell, light modals), omit `reverse` or contrast will be wrong — align with the **screen/component structure** rule (semantic foreground section).
+- **`reverse`** is dark-surface ink only. Light surfaces omit it — same contrast rule as `DsText` `foreground-reverse` in **Components & screens — structure**.
 
 ## Changes
 - Keep display styles centralized in one module (e.g. a `markdownMainStyle`-style helper) so list markers, headings, and links stay aligned with design tokens.

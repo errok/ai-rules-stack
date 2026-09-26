@@ -10,13 +10,7 @@ alwaysApply: false
 
 ## Vocabulary — `Stack` vs `Navigator`
 
-| Symbol | When | Example |
-|---|---|---|
-| **`*Stack`** | Native stack navigator (screens pushed in a domain section) | `HomeStack`, `SettingsStack`, `PublicStack` |
-| **`*Navigator`** | **Bottom tab menu only** (hosts stacks as tab screens) | `BottomTabNavigator` |
-| **`RootNavigator`** | Auth-status gate at app root (public vs private shell) — not a stack, not the tab menu | `RootNavigator` |
-
-Do **not** name domain stacks `*Navigator` (`HomeNavigator`, `SettingNavigator`, …). **Navigator** is reserved for the tab menu.
+`*Stack` = domain native stack. `*Navigator` = bottom tab menu only (`BottomTabNavigator`). `RootNavigator` = auth gate. The **Naming** always-rule is the table — do not name a domain stack `*Navigator`.
 
 ## Folder layout — private stacks
 

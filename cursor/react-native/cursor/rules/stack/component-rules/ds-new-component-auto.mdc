@@ -95,7 +95,7 @@ Wire in `components/DevDebugMenu/DevDebugMenu.tsx`:
 
 **Token-only modules** (no `Ds*` wrapper, e.g. `activityIndicator.js`): lab documents the token + lists DS consumers (`DsButton` loading, …).
 
-To land `Ds*` + labs from a product branch onto stack `main`, use **`/promote-ds`**. Do not dump app widgets. **Do not keep product forks of `components/ds/**` (primitives or composed)** — missing API goes to `main`; product style goes to `components/`, not a new composed `Ds*` (see **Product apps do not override the DS**).
+To land `Ds*` + labs from a product branch onto stack `main`, use **`/promote-ds`**. Do not dump app widgets. Product style goes to `components/`, not a new composed `Ds*` — **Product apps do not override the DS**.
 
 ## 7. Quick validation before PR
 

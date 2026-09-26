@@ -67,6 +67,7 @@ if err := db.Where(...).Where(...).First(&model).Error; err != nil { ... }
 
 ## Queries — context and transaction
 - Start every query from **`database.FromContext(ctx, s.db)`**: it returns the caller's transaction when `ctx` carries one, else `s.db` bound to `ctx`. Never a bare `s.db` or `s.db.WithContext(ctx)`, and no `WithTx(tx)` constructor.
+- Do **not** chain `.Debug()`. SQL trace is `LOG_DB_LEVEL` / `LOG_LEVEL` at DEBUG, not a per-query flag.
 - The service never decides whether it runs in a transaction: the orchestrator opens it and hands the `ctx` down (see **Transactions** in the application layer rule).
 - A multi-statement write inside one service opens `database.FromContext(ctx, s.db).Transaction(func(tx *gorm.DB) error { … })`; inside a caller's transaction it becomes a savepoint.
 

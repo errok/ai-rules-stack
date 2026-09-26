@@ -1,6 +1,6 @@
 ---
 description: Naming for loading booleans (is{Domain}Loading)
-globs: **/*.ts,**/*.tsx
+globs: screens/**/*.ts,screens/**/*.tsx,components/**/*.ts,components/**/*.tsx,hooks/**/*.ts,hooks/**/*.tsx,stores/**/*.ts
 alwaysApply: false
 ---
 
