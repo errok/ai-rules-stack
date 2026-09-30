@@ -14,6 +14,12 @@ When editing the codebase, **do not remove or "clean up"** without asking the us
 
 If you believe something should be removed or replaced, **propose it in the reply** and wait for confirmation before deleting it.
 
+## Unused declarations
+
+- Do not leave a function, component, hook or constant that nothing references: remove it in the change that
+  stops using it. Leftovers found later (the audit's `F-DEAD-01`) are **proposed** for removal, never deleted
+  silently — they may be kept on purpose (work in progress).
+
 ## Documentation (temporary / interim changes)
 
 **Do not update** `README.md`, `documentation/**`, setup guides or similar docs to describe **temporary** workarounds (hardcoded redirects, shared bundle IDs, placeholder URLs, etc.) unless the user **explicitly** asks for doc updates.
