@@ -240,8 +240,15 @@ export const uiChecks = [
           }
           const mod = st.moduleSpecifier.text;
           const clause = st.importClause;
-          if (mod === 'react-native' && clause?.namedBindings && ts.isNamedImports(clause.namedBindings)) {
+          // A type-only import (a ref typed `ScrollView`) renders nothing: only value imports count.
+          if (
+            mod === 'react-native' &&
+            !clause?.isTypeOnly &&
+            clause?.namedBindings &&
+            ts.isNamedImports(clause.namedBindings)
+          ) {
             const raw = clause.namedBindings.elements
+              .filter((e) => !e.isTypeOnly)
               .map((e) => (e.propertyName ?? e.name).text)
               .filter((n) => covered.has(n));
             if (raw.length) {
