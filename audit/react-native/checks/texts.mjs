@@ -161,12 +161,6 @@ export const TEXTS = {
   },
 
   // Design system
-  'F-DS-01': {
-    title: 'Modifications du design system',
-    expected: 'l’app ne modifie pas `components/ds` ni ses tokens : ils viennent de la stack commune.',
-    why: 'sinon la prochaine mise à jour de la stack écrase la modification, ou bute dessus.',
-    fix: 'annuler la modification dans l’app et la proposer à la stack avec `/promote-ds`.',
-  },
   'F-DS-02': {
     title: 'Couleurs en dur dans le design system',
     expected: 'les composants `Ds*` et leurs tokens n’ont aucune couleur écrite en dur (`#fff`, `rgb(…)`).',

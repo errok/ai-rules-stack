@@ -1,5 +1,5 @@
 // Command audit checks a Go backend of the stack against the scriptable part of the stack's .claude rules and
-// writes tmp/audit/stack/report.md — a report meant to be read and acted on by a human or an AI agent.
+// writes tmp/audit/<date_time>/stack/report.md — a report meant to be read and acted on by a human or an AI agent.
 // It has its own go.mod (stdlib only), so the backend's `go build ./...` never compiles it.
 //
 //	make audit     # in the backend: cd sub-modules/ai-rules-stack/audit/golang && go run . -root <backend>
@@ -21,6 +21,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type severity int
@@ -75,7 +76,7 @@ func main() {
 		fail(err)
 	}
 	rootFlag := flag.String("root", cwd, "backend repository root")
-	outFlag := flag.String("out", "tmp/audit/stack/report.md", "report path, relative to the root")
+	outFlag := flag.String("out", "", "report path, relative to the root (default tmp/audit/<run>/stack/report.md)")
 	flag.BoolVar(&verbose, "v", false, "print every check, OK ones too")
 	flag.BoolVar(&verbose, "verbose", false, "print every check, OK ones too")
 	// -h / --help (and an unknown option) print the French help; flag handles the exit code.
@@ -98,6 +99,9 @@ func main() {
 	}
 
 	out := filepath.Join(root, *outFlag)
+	if *outFlag == "" {
+		out = filepath.Join(root, "tmp", "audit", auditRun(), "stack", "report.md")
+	}
 	rel, _ := filepath.Rel(root, out)
 	printHeader()
 	results := runChecks(p, allChecks(), printResult)
@@ -107,6 +111,15 @@ func main() {
 	if errors := printSummary(results, rel); errors > 0 {
 		os.Exit(1)
 	}
+}
+
+// auditRun names this run's report folder, tmp/audit/<run>/: AUDIT_RUN when set, else the date and time it
+// started, so every run keeps its reports as a trace.
+func auditRun() string {
+	if run := os.Getenv("AUDIT_RUN"); run != "" {
+		return run
+	}
+	return time.Now().Format("2006-01-02_15-04-05")
 }
 
 func errorf(format string, args ...any) error { return fmt.Errorf(format, args...) }

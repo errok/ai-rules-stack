@@ -11,10 +11,11 @@ argument-hint: "[local] — skip the backend audit"
 - Run `make audit` at the root of this repo. It runs the **stack audit** then, when the app has one, the
   **project audit**, one after the other. Each prints, check by check as they run, a status — `✅ OK`,
   `❌ ERREUR`, `🟠 À VÉRIFIER`, `🔵 SUGGESTION`, `⏭️ NON LANCÉ` — with what to do and every place involved, and
-  writes `tmp/audit/stack/report.md` / `tmp/audit/project/report.md`. **Exit code 1 means errors remain**
+  writes `tmp/audit/<run>/stack/report.md` / `…/project/report.md` (`<run>`: date and time of the run; the
+  paths are printed at the end of each audit). **Exit code 1 means errors remain**
   — that is the result, not a failure of the command.
 - Unless the argument is `local`, when the Go back sits next to the app (`../<app>-back`, or `AUDIT_BACK_DIR`)
-  also run `make audit` there (`tmp/audit/stack/report.md`), so the release is checked on both sides.
+  also run `make audit` there (`tmp/audit/<run>/stack/report.md`), so the release is checked on both sides.
 - Show the user the status lines as printed (every audit), then the totals. Talk to the user in French, with
   the same status words; the reference in brackets (`[F-SVC-01]`, `[P-TW-01]`) is how the user and the reports
   name a point.
@@ -33,7 +34,8 @@ Then say which you propose to handle now and why:
 - **Not proposed without an explicit yes:** anything that removes code or fields (🔵 SUGGESTION dead code,
   unused DTO fields, commented-out code — see the no-unrequested-cleanup rule), a change on the other repo, and
   🟠 that may be legitimate (then offer an `audit-ignore <reference>: <reason>` instead of a fix).
-- **Not fixable here:** `components/ds/**` findings — they go to the stack through `/promote-ds`.
+- **`components/ds/**` findings:** fixed in the app like any other (the app's DS may drift from the stack); when
+  the change is worth it for the other apps, offer `/promote-ds` as well.
 
 ## 3. Ask — and wait
 

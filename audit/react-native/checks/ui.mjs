@@ -2,7 +2,6 @@
 
 import ts from 'typescript';
 
-import { execSync } from 'node:child_process';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { classAttributes, isComponentFile } from '../lib/engine.mjs';
@@ -20,9 +19,6 @@ const RULE = {
   svg: 'stack/ui-rules/svg-assets-auto.md',
   navigation: 'stack/stack-rules/react-navigation-auto.md',
 };
-
-/** The stack branch the app's DS is compared with (the stack remote is `origin_stack` by convention). */
-const STACK_REF = process.env.AUDIT_STACK_REF ?? 'origin_stack/main';
 
 const tagName = (f, n) => (ts.isJsxElement(n) ? n.openingElement.tagName : n.tagName).getText(f.sf);
 
@@ -90,25 +86,6 @@ export const uiChecks = [
         }
       }
       return out;
-    },
-  },
-  {
-    id: 'F-DS-01',
-    rule: RULE.noOverride,
-    sev: 'error',
-    run: (p) => {
-      try {
-        execSync(`git rev-parse --verify --quiet ${STACK_REF}`, { cwd: p.root, stdio: 'ignore' });
-      } catch {
-        return { skipped: `\`${STACK_REF}\` introuvable en local — lancer \`git fetch origin_stack\`` };
-      }
-      const changed = execSync(`git diff --name-only ${STACK_REF} -- components/ds design-tokens/components/ds`, {
-        cwd: p.root,
-        encoding: 'utf8',
-      })
-        .split('\n')
-        .filter(Boolean);
-      return changed.map((file) => ({ file, line: 0, msg: `diffère de \`${STACK_REF}\`` }));
     },
   },
   {

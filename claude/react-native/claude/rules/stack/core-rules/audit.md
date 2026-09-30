@@ -15,12 +15,12 @@ ignore — and writes its complete report. The output is in French; code and com
 
 | Audit | Checks | Code | Report |
 |---|---|---|---|
-| Stack | the stack rules (`.claude/rules/stack/`) + the contract with the Go back (`F-API-*`) | `sub-modules/ai-rules-stack/audit/react-native/` | `tmp/audit/stack/report.md` |
-| Project | the app's own rules (`.claude/rules/project/`), only when the app has scriptable ones | `scripts/audit/` in the app, reusing the stack engine (`lib/engine.mjs`) | `tmp/audit/project/report.md` |
+| Stack | the stack rules (`.claude/rules/stack/`) + the contract with the Go back (`F-API-*`) | `sub-modules/ai-rules-stack/audit/react-native/` | `tmp/audit/<run>/stack/report.md` |
+| Project | the app's own rules (`.claude/rules/project/`), only when the app has scriptable ones | `scripts/audit/` in the app, reusing the stack engine (`lib/engine.mjs`) | `tmp/audit/<run>/project/report.md` |
 
 ```make
 audit:
-	@status=0; \
+	@status=0; export AUDIT_RUN=$$(date +%Y-%m-%d_%H-%M-%S); \
 	node sub-modules/ai-rules-stack/audit/react-native/audit.mjs $(ARGS) || status=1; \
 	printf '\n%s\n\n' '============================================================'; \
 	node scripts/audit/audit.mjs $(ARGS) || status=1; \
@@ -31,11 +31,14 @@ Options, passed through `ARGS` (make keeps `-h` for itself): `make audit ARGS=-v
 check, OK ones too; `make audit ARGS=-h` / `--help` prints what each audit does and its checks, one line each,
 without running them. The project audit takes the same options (`parseArgs`, `printHelp` from the engine).
 
-Reports are generated, never versioned: they live under `tmp/` (one folder per audit, plus `tmp/api/` for the
-API map), and the app's `.gitignore` ignores `tmp/`.
+Reports are generated, never versioned: `tmp/` is git-ignored. Each run gets its own folder,
+`tmp/audit/<run>/` with `<run>` its date and time (`AAAA-MM-JJ_HH-MM-SS`), holding `stack/` and `project/`: earlier
+runs stay as a trace of what was fixed — never delete them unasked. The latest run is the last folder by name.
+`make audit` sets `AUDIT_RUN` once so both audits of a run share the folder; run alone, an audit names it itself.
 
-Settings, all optional (environment): `AUDIT_BACK_DIR` (default `../<app>-back`), `AUDIT_STACK_REF` (the stack
-branch the DS is compared with, default `origin_stack/main`).
+Settings, all optional (environment): `AUDIT_BACK_DIR` (default `../<app>-back`), `AUDIT_RUN` (the run folder's
+name). The app's DS is not compared with the stack's: apps drift on purpose, their DS evolutions go up to the
+stack through `/promote-ds`.
 
 ## Running it
 

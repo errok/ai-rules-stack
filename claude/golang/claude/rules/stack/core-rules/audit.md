@@ -12,17 +12,20 @@ The stack audit lives in `sub-modules/ai-rules-stack/audit/golang/` (Go, `go/ast
 `go.mod` so the backend's `go build ./...` never compiles it). It checks the stack rules
 (`.claude/rules/stack/`), prints as they run the checks that are not OK — `❌ ERREUR`, `🟠 À VÉRIFIER`,
 `🔵 SUGGESTION`, with what is expected, why, where, how to fix and how to ignore — and writes the complete
-`tmp/audit/stack/report.md`. The output is in French; code and comments stay English.
+`tmp/audit/<run>/stack/report.md`, `<run>` being the date and time of the run (`AAAA-MM-JJ_HH-MM-SS`, or
+`AUDIT_RUN` when set). The output is in French; code and comments stay English.
 
 ```make
 audit:
 	@cd sub-modules/ai-rules-stack/audit/golang && go run . -root $(CURDIR) $(ARGS)
 ```
 
-Options: `-root` (backend root, default the working directory), `-out` (report path relative to the root),
+Options: `-root` (backend root, default the working directory), `-out` (report path relative to the root,
+instead of the run folder),
 `-v` / `--verbose` (every check, OK ones too), `-h` / `--help` (what the audit does and its checks, one line
 each, without running them). From make: `make audit ARGS=-v`, `make audit ARGS=--help`.
-The report is generated, never versioned: `tmp/` is git-ignored (air already builds there).
+The report is generated, never versioned: `tmp/` is git-ignored (air already builds there). Each run keeps its
+own folder as a trace of what was fixed — never delete them unasked; the latest run is the last folder by name.
 The front ↔ back contract (DTOs, requests, routes) is checked from the app (`make audit` there).
 
 When the backend gets project rules a script can verify, add a project audit in its `scripts/audit/` and run it

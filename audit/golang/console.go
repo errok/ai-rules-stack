@@ -49,8 +49,9 @@ var sevIcon = map[severity]string{sevError: "❌", sevWarn: "🟠", sevInfo: "�
 func printHelp(checks []check) {
 	fmt.Printf("Audit du stack Go — %s\n\n", appName)
 	fmt.Println("Vérifie le backend contre les règles communes du stack Go (.claude/rules/stack). Affiche chaque point")
-	fmt.Println("dès qu'il est vérifié et écrit tmp/audit/stack/report.md. Le contrat front ↔ back (DTO,")
-	fmt.Println("requêtes, routes) se vérifie depuis l'app, avec son propre make audit.")
+	fmt.Println("dès qu'il est vérifié et écrit tmp/audit/<date_heure>/stack/report.md (un dossier par lancement,")
+	fmt.Println("gardé comme trace). Le contrat front ↔ back (DTO, requêtes, routes) se vérifie depuis l'app, avec son")
+	fmt.Println("propre make audit.")
 	fmt.Println()
 	fmt.Println("Usage :")
 	fmt.Println("  make audit                  audit du stack")
@@ -62,7 +63,10 @@ func printHelp(checks []check) {
 	fmt.Println("  -h, --help      affiche cette aide, sans lancer l'audit")
 	fmt.Println("  -v, --verbose   affiche tous les points, y compris ceux qui sont OK (par défaut : seulement ceux à traiter)")
 	fmt.Println("  -root <dir>     racine du backend (défaut : le dossier courant)")
-	fmt.Println("  -out <fichier>  chemin du rapport, relatif à la racine (défaut : tmp/audit/stack/report.md)")
+	fmt.Println("  -out <fichier>  chemin du rapport, relatif à la racine (défaut : tmp/audit/<date_heure>/stack/report.md)")
+	fmt.Println()
+	fmt.Println("Réglage (optionnel) :")
+	fmt.Println("  AUDIT_RUN       nom du dossier des rapports de ce lancement (défaut : date et heure, AAAA-MM-JJ_HH-MM-SS)")
 	fmt.Printf("\nPoints vérifiés (%d) — gravité en cas d'échec : ❌ erreur · 🟠 à vérifier · 🔵 suggestion\n", len(checks))
 	last := ""
 	for _, c := range checks {

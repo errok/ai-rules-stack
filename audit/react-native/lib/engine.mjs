@@ -23,6 +23,22 @@ const MEANING = {
   info: 'ménage, rien de bloquant',
 };
 
+/**
+ * Name of this run's report folder, tmp/audit/<run>/: the date and time it started (AAAA-MM-JJ_HH-MM-SS), so every
+ * run keeps its reports as a trace. The app's `make audit` sets AUDIT_RUN once, so the stack and project reports
+ * of one run land in the same folder.
+ */
+export const AUDIT_RUN =
+  process.env.AUDIT_RUN ||
+  (() => {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+  })();
+
+/** Report of one audit of this run: tmp/audit/<run>/<name>/report.md (name: 'stack', 'project'). */
+export const auditReportPath = (name) => `tmp/audit/${AUDIT_RUN}/${name}/report.md`;
+
 const places = (n) => (n === 1 ? '1 endroit' : `${n} endroits`);
 
 /** Places printed in the terminal for a suggestion; errors and checks to review print them all. */
@@ -245,7 +261,7 @@ export const printHelp = (config, { description, usage, settings = [] }) => {
  *   checks,       [{ id, rule, sev: 'error' | 'warn' | 'info', run(project) → findings | { skipped } }]
  *   texts,        { [id]: { title, expected, why, fix } } — French wording of each check
  *   groups,       { [AREA]: title } — AREA is the middle part of an id (F-<AREA>-NN)
- *   reportPath,   relative to the app root
+ *   reportPath,   relative to the app root — auditReportPath(name)
  *   notes,        extra bullets for "Comment traiter ce rapport"
  * }
  * Returns the number of error-level findings.
