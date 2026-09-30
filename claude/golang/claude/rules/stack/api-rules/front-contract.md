@@ -10,10 +10,10 @@ paths:
 When the React Native app of the stack sits next to this backend (`../<app>` for `<app>-back`), its stack
 tooling reads this repo's code and generates:
 
-- `../<app>/docs/api/api-map.md` (`npm run api:map` in the app): each route → the front function calling it →
+- `../<app>/tmp/api/api-map.md` (`npm run api:map` in the app): each route → the front function calling it →
   every screen reaching it, however deep. Read it before changing or removing a route to know which screens
   are impacted, and to spot routes the app never calls.
-- `../<app>/docs/api/dto-check.md` (`npm run api:dto`): each `*Dto` / `*Request` struct checked against the
+- `../<app>/tmp/api/dto-check.md` (`npm run api:dto`): each `*Dto` / `*Request` struct checked against the
   app's types (missing fields, nullability, `omitempty`, `binding:"required"`, query params), plus the fields
   the app never reads — candidates to drop from a DTO. The app's stack audit runs the same comparison
   (`F-API-*`).

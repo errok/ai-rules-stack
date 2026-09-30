@@ -3,7 +3,7 @@ description: make audit — stack audit of the Go backend (ai-rules-stack, own G
 paths:
   - ".claude/rules/**"
   - "scripts/audit/**"
-  - "documentation/reports/**"
+  - "tmp/audit/**"
 ---
 
 # Rules audit (`make audit`)
@@ -12,7 +12,7 @@ The stack audit lives in `sub-modules/ai-rules-stack/audit/golang/` (Go, `go/ast
 `go.mod` so the backend's `go build ./...` never compiles it). It checks the stack rules
 (`.claude/rules/stack/`), prints as they run the checks that are not OK — `❌ ERREUR`, `🟠 À VÉRIFIER`,
 `🔵 SUGGESTION`, with what is expected, why, where, how to fix and how to ignore — and writes the complete
-`documentation/reports/audit-stack.md`. The output is in French; code and comments stay English.
+`tmp/audit/stack/report.md`. The output is in French; code and comments stay English.
 
 ```make
 audit:
@@ -22,6 +22,7 @@ audit:
 Options: `-root` (backend root, default the working directory), `-out` (report path relative to the root),
 `-v` / `--verbose` (every check, OK ones too), `-h` / `--help` (what the audit does and its checks, one line
 each, without running them). From make: `make audit ARGS=-v`, `make audit ARGS=--help`.
+The report is generated, never versioned: `tmp/` is git-ignored (air already builds there).
 The front ↔ back contract (DTOs, requests, routes) is checked from the app (`make audit` there).
 
 When the backend gets project rules a script can verify, add a project audit in its `scripts/audit/` and run it

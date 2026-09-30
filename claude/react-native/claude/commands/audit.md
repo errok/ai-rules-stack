@@ -11,10 +11,10 @@ argument-hint: "[local] — skip the backend audit"
 - Run `make audit` at the root of this repo. It runs the **stack audit** then, when the app has one, the
   **project audit**, one after the other. Each prints, check by check as they run, a status — `✅ OK`,
   `❌ ERREUR`, `🟠 À VÉRIFIER`, `🔵 SUGGESTION`, `⏭️ NON LANCÉ` — with what to do and every place involved, and
-  writes `docs/reports/audit-stack.md` / `docs/reports/audit-project.md`. **Exit code 1 means errors remain**
+  writes `tmp/audit/stack/report.md` / `tmp/audit/project/report.md`. **Exit code 1 means errors remain**
   — that is the result, not a failure of the command.
 - Unless the argument is `local`, when the Go back sits next to the app (`../<app>-back`, or `AUDIT_BACK_DIR`)
-  also run `make audit` there (`documentation/reports/audit-stack.md`), so the release is checked on both sides.
+  also run `make audit` there (`tmp/audit/stack/report.md`), so the release is checked on both sides.
 - Show the user the status lines as printed (every audit), then the totals. Talk to the user in French, with
   the same status words; the reference in brackets (`[F-SVC-01]`, `[P-TW-01]`) is how the user and the reports
   name a point.

@@ -2,7 +2,7 @@
 
 /**
  * Part 1 — which Go back routes each screen reaches, directly or through any depth of components,
- * hooks, stores and helpers. Writes docs/api/api-map.md.
+ * hooks, stores and helpers. Writes tmp/api/api-map.md.
  *
  *   npm run api:map          # the app's script: node sub-modules/ai-rules-stack/audit/react-native/api-map.mjs
  *   AUDIT_BACK_DIR=/path/to/back npm run api:map   # default: ../<app>-back

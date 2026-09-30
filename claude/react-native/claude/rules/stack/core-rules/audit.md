@@ -3,7 +3,7 @@ description: make audit — stack audit (shared rules, from ai-rules-stack) then
 paths:
   - ".claude/rules/**"
   - "scripts/audit/**"
-  - "docs/reports/**"
+  - "tmp/audit/**"
 ---
 
 # Rules audit (`make audit`)
@@ -15,8 +15,8 @@ ignore — and writes its complete report. The output is in French; code and com
 
 | Audit | Checks | Code | Report |
 |---|---|---|---|
-| Stack | the stack rules (`.claude/rules/stack/`) + the contract with the Go back (`F-API-*`) | `sub-modules/ai-rules-stack/audit/react-native/` | `docs/reports/audit-stack.md` |
-| Project | the app's own rules (`.claude/rules/project/`), only when the app has scriptable ones | `scripts/audit/` in the app, reusing the stack engine (`lib/engine.mjs`) | `docs/reports/audit-project.md` |
+| Stack | the stack rules (`.claude/rules/stack/`) + the contract with the Go back (`F-API-*`) | `sub-modules/ai-rules-stack/audit/react-native/` | `tmp/audit/stack/report.md` |
+| Project | the app's own rules (`.claude/rules/project/`), only when the app has scriptable ones | `scripts/audit/` in the app, reusing the stack engine (`lib/engine.mjs`) | `tmp/audit/project/report.md` |
 
 ```make
 audit:
@@ -30,6 +30,9 @@ audit:
 Options, passed through `ARGS` (make keeps `-h` for itself): `make audit ARGS=-v` / `--verbose` prints every
 check, OK ones too; `make audit ARGS=-h` / `--help` prints what each audit does and its checks, one line each,
 without running them. The project audit takes the same options (`parseArgs`, `printHelp` from the engine).
+
+Reports are generated, never versioned: they live under `tmp/` (one folder per audit, plus `tmp/api/` for the
+API map), and the app's `.gitignore` ignores `tmp/`.
 
 Settings, all optional (environment): `AUDIT_BACK_DIR` (default `../<app>-back`), `AUDIT_STACK_REF` (the stack
 branch the DS is compared with, default `origin_stack/main`).

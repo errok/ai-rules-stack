@@ -2,7 +2,7 @@
 
 /**
  * Part 2 — do the front's request / response types match the Go structs the back binds and returns,
- * and which response fields does the app actually use? Writes docs/api/dto-check.md; exits 1 on ❌.
+ * and which response fields does the app actually use? Writes tmp/api/dto-check.md; exits 1 on ❌.
  *
  *   npm run api:dto          # the app's script: node sub-modules/ai-rules-stack/audit/react-native/dto-check.mjs
  *   AUDIT_BACK_DIR=/path/to/back npm run api:dto   # default: ../<app>-back

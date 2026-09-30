@@ -9,6 +9,8 @@ Tooling behind each app's `make audit` and the `/audit` command. Apps run it fro
 | `react-native/` | Node + TypeScript compiler (the app's `typescript`) | `audit.mjs` (stack audit), `api-map.mjs`, `dto-check.mjs` |
 | `golang/` | Go, `go/ast`, stdlib only, own `go.mod` | `go run . -root <backend>` from `audit/golang` |
 
+- Reports go to the app's `tmp/` (git-ignored), one folder per audit: `tmp/audit/stack/report.md`,
+  `tmp/audit/project/report.md`, and `tmp/api/` for `api-map.md` / `dto-check.md`.
 - Options, same for every audit: `-h` / `--help` (what it does, its checks one line each, without running
   them), `-v` / `--verbose` (print the OK checks too; by default only the others). Apps pass them through
   `make audit ARGS=…`.

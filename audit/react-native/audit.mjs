@@ -3,7 +3,7 @@
 /**
  * Stack audit — checks a React Native app against the scriptable part of the stack's .claude rules (and the
  * contract with its Go back when one sits next to it), prints each check as soon as it has run, with the
- * detail of what fails, and writes docs/reports/audit-stack.md for a human or an AI to act on.
+ * detail of what fails, and writes tmp/audit/stack/report.md for a human or an AI to act on.
  *
  * Run from the app root (the app's `make audit` does it, then runs the app's own audit when it has one):
  *   node sub-modules/ai-rules-stack/audit/react-native/audit.mjs [-h|--help] [-v|--verbose]
@@ -50,10 +50,10 @@ const config = {
   checks: [...codeChecks, ...uiChecks, ...contractChecks, ...toolingChecks],
   texts: TEXTS,
   groups: GROUPS,
-  reportPath: 'docs/reports/audit-stack.md',
+  reportPath: 'tmp/audit/stack/report.md',
   notes: [
     "`components/ds/**` appartient à la stack : un point du DS se corrige sur la stack via `/promote-ds`, jamais dans l'app.",
-    "Les règles propres à l'app sont vérifiées par son audit projet (`docs/reports/audit-project.md`), lancé juste après par `make audit` quand l'app en a un.",
+    "Les règles propres à l'app sont vérifiées par son audit projet (`tmp/audit/project/report.md`), lancé juste après par `make audit` quand l'app en a un.",
     'Les points côté back sont dans le rapport du back (`make audit` dans son dépôt).',
   ],
 };
@@ -65,7 +65,7 @@ if (options.help || options.unknown.length) {
   }
   printHelp(config, {
     description:
-      'Vérifie l’app contre les règles communes du stack (.claude/rules/stack) et, quand son back Go est à côté, le contrat front ↔ back (DTO, requêtes, routes). Affiche chaque point dès qu’il est vérifié et écrit docs/reports/audit-stack.md. Les règles propres à l’app sont vérifiées ensuite par son audit projet.',
+      'Vérifie l’app contre les règles communes du stack (.claude/rules/stack) et, quand son back Go est à côté, le contrat front ↔ back (DTO, requêtes, routes). Affiche chaque point dès qu’il est vérifié et écrit tmp/audit/stack/report.md. Les règles propres à l’app sont vérifiées ensuite par son audit projet.',
     usage: [
       'make audit                  audit du stack, puis audit du projet',
       'make audit ARGS=-v          idem, en affichant aussi les points OK',

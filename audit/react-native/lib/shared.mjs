@@ -8,7 +8,7 @@ import { buildCallGraph, loadFront, readHttpCall } from './front.mjs';
 /** The app being audited: the working directory (make / npm run from the repo root), or AUDIT_ROOT. */
 export const FRONT_ROOT = resolve(process.env.AUDIT_ROOT ?? process.cwd());
 export const APP_NAME = basename(FRONT_ROOT);
-export const OUT_DIR = join(FRONT_ROOT, 'docs', 'api');
+export const OUT_DIR = join(FRONT_ROOT, 'tmp', 'api');
 
 /**
  * calls: every `r` / `rPublic` call — { nodeId, http, key, route } where route is null when the back

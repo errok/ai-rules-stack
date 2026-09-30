@@ -1,5 +1,5 @@
 // Command audit checks a Go backend of the stack against the scriptable part of the stack's .claude rules and
-// writes documentation/reports/audit-stack.md — a report meant to be read and acted on by a human or an AI agent.
+// writes tmp/audit/stack/report.md — a report meant to be read and acted on by a human or an AI agent.
 // It has its own go.mod (stdlib only), so the backend's `go build ./...` never compiles it.
 //
 //	make audit     # in the backend: cd sub-modules/ai-rules-stack/audit/golang && go run . -root <backend>
@@ -75,7 +75,7 @@ func main() {
 		fail(err)
 	}
 	rootFlag := flag.String("root", cwd, "backend repository root")
-	outFlag := flag.String("out", "documentation/reports/audit-stack.md", "report path, relative to the root")
+	outFlag := flag.String("out", "tmp/audit/stack/report.md", "report path, relative to the root")
 	flag.BoolVar(&verbose, "v", false, "print every check, OK ones too")
 	flag.BoolVar(&verbose, "verbose", false, "print every check, OK ones too")
 	// -h / --help (and an unknown option) print the French help; flag handles the exit code.

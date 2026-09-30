@@ -11,10 +11,10 @@ argument-hint: "[local] — skip the app audit"
 - Run `make audit` at the root of this repo. It runs the **stack audit** (and a project audit after it when
   the backend has one). It prints, check by check as they run, a status — `✅ OK`, `❌ ERREUR`,
   `🟠 À VÉRIFIER`, `🔵 SUGGESTION` — with what to do and every place involved, and writes
-  `documentation/reports/audit-stack.md`. **Exit code 1 means errors remain** — that is the result, not a
+  `tmp/audit/stack/report.md`. **Exit code 1 means errors remain** — that is the result, not a
   failure of the command.
 - Unless the argument is `local`, when the React Native app sits next to this backend (`../<app>` for
-  `<app>-back`) also run `make audit` there (`docs/reports/`): the DTO / request / route contract with the app
+  `<app>-back`) also run `make audit` there (`tmp/audit/`): the DTO / request / route contract with the app
   is checked from that side.
 - Show the user the status lines as printed (every audit), then the totals. Talk to the user in French, with
   the same status words; the reference in brackets (`[B-ARCH-01]`) is how the user and the reports name a point.

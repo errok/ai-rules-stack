@@ -5,7 +5,7 @@ paths:
   - "hooks/**"
   - "stores/**"
   - "screens/**/hooks/**"
-  - "docs/api/**"
+  - "tmp/api/**"
 ---
 
 # Front ↔ back contract — API map and DTO check
@@ -13,11 +13,11 @@ paths:
 When the app's Go back (golang stack) sits next to it as `../<app>-back` (or at `AUDIT_BACK_DIR`), the stack
 tooling in `sub-modules/ai-rules-stack/audit/react-native/` generates two reports:
 
-- `docs/api/api-map.md` (`npm run api:map`): for each screen, every back route it reaches, **directly or
+- `tmp/api/api-map.md` (`npm run api:map`): for each screen, every back route it reaches, **directly or
   through any depth** of components, hooks, stores and helpers, with the longest / shortest chain, depth and
   path count; the reverse view (route → front function → screens, and entry points outside screens such as
   `App` boot); the gaps (front calls without a route, routes never called, API functions no screen reaches).
-- `docs/api/dto-check.md` (`npm run api:dto`): the types given to `r<…>` / sent as `data` checked against the
+- `tmp/api/dto-check.md` (`npm run api:dto`): the types given to `r<…>` / sent as `data` checked against the
   Go structs the handler binds and returns (`json` tags, pointer = nullable, `omitempty`,
   `binding:"required"`), GET query keys against `c.Query`, then **field usage**: fields the back sends that the
   app never declares, never reads, or only writes. The same comparison runs in the stack audit (`F-API-*`).
