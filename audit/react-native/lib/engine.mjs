@@ -175,8 +175,69 @@ const listRules = (scope) => {
   return rules.sort();
 };
 
+// ─── Options and help ────────────────────────────────────────────────────────
+
+const SEV_ICON = { error: '❌', warn: '🟠', info: '🔵' };
+
+/** `-h` / `--help` and `-v` / `--verbose`; anything else is returned in `unknown`. */
+export const parseArgs = (argv = process.argv.slice(2)) => {
+  const options = { help: false, verbose: false, unknown: [] };
+  for (const arg of argv) {
+    if (arg === '-h' || arg === '--help') {
+      options.help = true;
+    } else if (arg === '-v' || arg === '--verbose') {
+      options.verbose = true;
+    } else {
+      options.unknown.push(arg);
+    }
+  }
+  return options;
+};
+
+/**
+ * What the audit does, its options, then every check on one line: reference, severity when it fails, subject
+ * and what is expected. Needs no project: printed before the code is loaded.
+ *
+ * meta: { description, usage: [lines], settings: [lines] }
+ */
+export const printHelp = (config, { description, usage, settings = [] }) => {
+  const { title, checks, texts, groups } = config;
+  console.info(`${title}\n`);
+  console.info(`${description}\n`);
+  console.info('Usage :');
+  for (const line of usage) {
+    console.info(`  ${line}`);
+  }
+  console.info('\nOptions :');
+  console.info('  -h, --help      affiche cette aide, sans lancer l’audit');
+  console.info(
+    '  -v, --verbose   affiche tous les points, y compris ceux qui sont OK (par défaut : seulement ceux à traiter)',
+  );
+  if (settings.length) {
+    console.info('\nRéglages (variables d’environnement, facultatifs) :');
+    for (const line of settings) {
+      console.info(`  ${line}`);
+    }
+  }
+  console.info(
+    `\nPoints vérifiés (${checks.length}) — gravité en cas d’échec : ❌ erreur · 🟠 à vérifier · 🔵 suggestion`,
+  );
+  let lastGroup = null;
+  for (const check of checks) {
+    const group = groups[check.id.split('-')[1]] ?? '';
+    if (group !== lastGroup) {
+      console.info(`\n  ${group}`);
+      lastGroup = group;
+    }
+    const text = texts[check.id];
+    console.info(`    ${check.id.padEnd(12)} ${SEV_ICON[check.sev]} ${plain(text.title)} — ${plain(text.expected)}`);
+  }
+};
+
 /**
  * Runs one audit: prints each check as soon as it has run, writes the report, prints the summary.
+ * By default only the checks that are not OK are printed; `verbose` prints every check too. The report is
+ * always complete.
  *
  * config: {
  *   title,        e.g. 'Audit du stack React Native — shooter'
@@ -189,7 +250,7 @@ const listRules = (scope) => {
  * }
  * Returns the number of error-level findings.
  */
-export const runAudit = (project, config) => {
+export const runAudit = (project, config, { verbose = false } = {}) => {
   const { title, scope, checks, texts, groups, reportPath, notes = [] } = config;
   const textOf = (check) => {
     const text = texts[check.id];
@@ -211,13 +272,21 @@ export const runAudit = (project, config) => {
   console.info(
     `La référence entre crochets (ex. [${exampleId}]) désigne le point dans le rapport, dans /audit et dans audit-ignore.`,
   );
+  if (!verbose) {
+    console.info('Seuls les points à traiter sont affichés — -v / --verbose pour voir aussi les points OK.');
+  }
 
   // Checks, printed as they run
   let lastGroup = null;
   // Exactly one blank line around the detail block of a failing check.
   let afterBlock = false;
   let afterHeader = false;
+  let printedAny = false;
   const printResult = ({ check, findings, skipped }) => {
+    if (!verbose && !skipped && !findings.length) {
+      return;
+    }
+    printedAny = true;
     const text = textOf(check);
     const group = groups[check.id.split('-')[1]] ?? '';
     if (group !== lastGroup) {
@@ -400,6 +469,9 @@ export const runAudit = (project, config) => {
   writeFileSync(reportAbs, `${out.join('\n')}\n`);
 
   // Summary
+  if (!verbose && !printedAny) {
+    console.info('\n✅ Tous les points sont OK.');
+  }
   console.info(
     `\nBilan : ${results.length} points vérifiés — ✅ ${ok} OK · ❌ ${failing('error')} en erreur · 🟠 ${failing('warn')} à vérifier · 🔵 ${failing('info')} suggestion(s)${skippedCount ? ` · ⏭️ ${skippedCount} non lancé(s)` : ''}`,
   );

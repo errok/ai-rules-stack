@@ -9,9 +9,9 @@ paths:
 # Rules audit (`make audit`)
 
 Two audits, run one after the other by the app's `make audit` (the second runs even when the first fails;
-the target exits 1 while an error remains). Each prints its checks as they run — `✅ OK`, `❌ ERREUR`,
+the target exits 1 while an error remains). Each prints, as they run, the checks that are not OK — `❌ ERREUR`,
 `🟠 À VÉRIFIER`, `🔵 SUGGESTION`, `⏭️ NON LANCÉ`, with what is expected, why, where, how to fix and how to
-ignore — and writes its report. The output is in French; code and comments stay English.
+ignore — and writes its complete report. The output is in French; code and comments stay English.
 
 | Audit | Checks | Code | Report |
 |---|---|---|---|
@@ -21,11 +21,15 @@ ignore — and writes its report. The output is in French; code and comments sta
 ```make
 audit:
 	@status=0; \
-	node sub-modules/ai-rules-stack/audit/react-native/audit.mjs || status=1; \
-	echo; \
-	node scripts/audit/audit.mjs || status=1; \
+	node sub-modules/ai-rules-stack/audit/react-native/audit.mjs $(ARGS) || status=1; \
+	printf '\n%s\n\n' '============================================================'; \
+	node scripts/audit/audit.mjs $(ARGS) || status=1; \
 	exit $$status
 ```
+
+Options, passed through `ARGS` (make keeps `-h` for itself): `make audit ARGS=-v` / `--verbose` prints every
+check, OK ones too; `make audit ARGS=-h` / `--help` prints what each audit does and its checks, one line each,
+without running them. The project audit takes the same options (`parseArgs`, `printHelp` from the engine).
 
 Settings, all optional (environment): `AUDIT_BACK_DIR` (default `../<app>-back`), `AUDIT_STACK_REF` (the stack
 branch the DS is compared with, default `origin_stack/main`).

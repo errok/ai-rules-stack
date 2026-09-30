@@ -34,10 +34,46 @@ var groupTitles = map[string]string{
 const consoleDetailLimit = 5
 
 var (
+	// verbose prints every check; by default only the checks that are not OK are printed.
+	verbose   bool
 	lastGroup string
 	// afterBlock / afterHeader keep exactly one blank line around the detail block of a failing check.
 	afterBlock, afterHeader bool
+	printedAny              bool
 )
+
+var sevIcon = map[severity]string{sevError: "❌", sevWarn: "🟠", sevInfo: "🔵"}
+
+// printHelp tells what the audit does, its options, then every check on one line: reference, severity when it
+// fails, subject and what is expected.
+func printHelp(checks []check) {
+	fmt.Printf("Audit du stack Go — %s\n\n", appName)
+	fmt.Println("Vérifie le backend contre les règles communes du stack Go (.claude/rules/stack). Affiche chaque point")
+	fmt.Println("dès qu'il est vérifié et écrit documentation/reports/audit-stack.md. Le contrat front ↔ back (DTO,")
+	fmt.Println("requêtes, routes) se vérifie depuis l'app, avec son propre make audit.")
+	fmt.Println()
+	fmt.Println("Usage :")
+	fmt.Println("  make audit                  audit du stack")
+	fmt.Println("  make audit ARGS=-v          idem, en affichant aussi les points OK")
+	fmt.Println("  make audit ARGS=--help      cette aide")
+	fmt.Println("  cd sub-modules/ai-rules-stack/audit/golang && go run . -root <backend> [options]")
+	fmt.Println()
+	fmt.Println("Options :")
+	fmt.Println("  -h, --help      affiche cette aide, sans lancer l'audit")
+	fmt.Println("  -v, --verbose   affiche tous les points, y compris ceux qui sont OK (par défaut : seulement ceux à traiter)")
+	fmt.Println("  -root <dir>     racine du backend (défaut : le dossier courant)")
+	fmt.Println("  -out <fichier>  chemin du rapport, relatif à la racine (défaut : documentation/reports/audit-stack.md)")
+	fmt.Printf("\nPoints vérifiés (%d) — gravité en cas d'échec : ❌ erreur · 🟠 à vérifier · 🔵 suggestion\n", len(checks))
+	last := ""
+	for _, c := range checks {
+		if g := groupOf(c.id); g != last {
+			fmt.Printf("\n  %s\n", g)
+			last = g
+		}
+		t := checkTexts[c.id]
+		fmt.Printf("    %-12s %s %s — %s\n", c.id, sevIcon[c.sev], plain(t.title), plain(t.expected))
+	}
+}
 
 func printHeader() {
 	fmt.Printf("Audit du stack Go — %s\n", appName)
@@ -49,6 +85,9 @@ func printHeader() {
 	}
 	fmt.Println()
 	fmt.Println("La référence entre crochets (ex. [B-ARCH-01]) désigne le point dans le rapport, dans /audit et dans audit-ignore.")
+	if !verbose {
+		fmt.Println("Seuls les points à traiter sont affichés — -v / --verbose pour voir aussi les points OK.")
+	}
 }
 
 func groupOf(id string) string {
@@ -61,6 +100,10 @@ func groupOf(id string) string {
 
 // printResult prints one check right after it ran: its status, then what to do and where when it fails.
 func printResult(r result) {
+	if !verbose && len(r.findings) == 0 {
+		return
+	}
+	printedAny = true
 	if g := groupOf(r.check.id); g != lastGroup {
 		bar := strings.Repeat("*", utf8.RuneCountInString(g))
 		fmt.Printf("\n%s\n%s\n%s\n", bar, g, bar)
@@ -136,6 +179,9 @@ func printSummary(results []result, reportPath string) (errors int) {
 		if r.check.sev == sevError {
 			errors += len(r.findings)
 		}
+	}
+	if !verbose && !printedAny {
+		fmt.Println("\n✅ Tous les points sont OK.")
 	}
 	fmt.Printf("\nBilan : %d points vérifiés — ✅ %d OK · ❌ %d en erreur · 🟠 %d à vérifier · 🔵 %d suggestion(s)\n",
 		len(results), ok, counts[sevError], counts[sevWarn], counts[sevInfo])

@@ -9,6 +9,9 @@ Tooling behind each app's `make audit` and the `/audit` command. Apps run it fro
 | `react-native/` | Node + TypeScript compiler (the app's `typescript`) | `audit.mjs` (stack audit), `api-map.mjs`, `dto-check.mjs` |
 | `golang/` | Go, `go/ast`, stdlib only, own `go.mod` | `go run . -root <backend>` from `audit/golang` |
 
+- Options, same for every audit: `-h` / `--help` (what it does, its checks one line each, without running
+  them), `-v` / `--verbose` (print the OK checks too; by default only the others). Apps pass them through
+  `make audit ARGS=…`.
 - **Stack audit** = the stack rules only. An app's own rules get a **project audit** in the app
   (`scripts/audit/`), built on `react-native/lib/engine.mjs` (`runAudit`, `createProject`, helpers), run right
   after the stack one by the app's `make audit`.

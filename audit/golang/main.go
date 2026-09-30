@@ -3,6 +3,7 @@
 // It has its own go.mod (stdlib only), so the backend's `go build ./...` never compiles it.
 //
 //	make audit     # in the backend: cd sub-modules/ai-rules-stack/audit/golang && go run . -root <backend>
+//	-h / --help lists the checks; -v / --verbose prints the OK checks too (by default only the others).
 //
 // Exits 1 when an error-level finding remains. A finding can be silenced where it is legitimate with a
 // comment on its line or the line above: `// audit-ignore B-XXX-00: reason`.
@@ -75,6 +76,15 @@ func main() {
 	}
 	rootFlag := flag.String("root", cwd, "backend repository root")
 	outFlag := flag.String("out", "documentation/reports/audit-stack.md", "report path, relative to the root")
+	flag.BoolVar(&verbose, "v", false, "print every check, OK ones too")
+	flag.BoolVar(&verbose, "verbose", false, "print every check, OK ones too")
+	// -h / --help (and an unknown option) print the French help; flag handles the exit code.
+	flag.Usage = func() {
+		if abs, err := filepath.Abs(*rootFlag); err == nil {
+			appName = filepath.Base(abs)
+		}
+		printHelp(allChecks())
+	}
 	flag.Parse()
 	root, err := filepath.Abs(*rootFlag)
 	if err != nil {
