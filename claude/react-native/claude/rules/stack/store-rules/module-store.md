@@ -1,0 +1,62 @@
+---
+description: Hooks vs thunks — hooks serve the UI, thunks (resource fetch / ensureLoaded / refetch) fill shared state; utils/moduleStore createModuleStore + createAsyncResourceStore, released when the last subscriber unmounts.
+paths:
+  - "hooks/**"
+  - "**/hooks/**"
+  - "stores/**"
+  - "utils/moduleStore/**"
+---
+
+# Hooks vs thunks — shared data (`utils/moduleStore`)
+
+## Two roles
+
+- **Hook = UI side.** Subscribes and reads for the render, formats for display, a11y, navigation, wires an
+  autonomous widget. Lives near the UI (`hooks/`, or a `hooks/` folder beside the feature).
+- **Thunk = store side.** The effect that fills or mutates shared state: fetch, refetch, invalidation. No JSX, no
+  navigation. With a module store, the thunk is the resource's `fetch` + `ensureLoaded` / `refetch`.
+
+```
+Widget (UI)
+  → hook useX (UI)
+    → resource.ensureLoaded / refetch (thunk)
+      → service (services/**, through r / rPublic)
+      → module store
+```
+
+- The hook consumes and orchestrates for the UI; loading and writing the store stays in the resource.
+- A widget can stand alone: it loads its data through its hook, not through its parent.
+- Zustand stores stay state + setters only (see the Zustand rule): the thunk lives in a module resource or in a
+  hook, never in `stores/**`.
+
+## Which store
+
+| Need | Tool |
+|---|---|
+| App state that outlives screens (session, profile, preferences, persisted caches) | Zustand in `stores/` |
+| Sync state shared by several components while one of them is mounted | `createModuleStore` |
+| Same remote payload for N widgets → 1 store, 1 API call (`inFlight` dedupe) | `createAsyncResourceStore` |
+
+## Lifetime
+
+- By default a module store **resets once its last subscriber unmounts** (one tick later, so a StrictMode remount
+  or a screen replacing another keeps the state). A fetch still running then is ignored; the next widget fetches
+  again.
+- `keepWhenUnused: true` only for data meant to outlive its widgets — say why in a comment.
+- Logout: `clearAllStores()` calls `resetAllModuleStores()`, which resets every instance — nothing to register per
+  store.
+
+## Usage
+
+- Create the instance **once, at module scope** of the hook file — never inside a component or hook body (a new
+  store per render). Export a `use{Name}` hook; widgets call it.
+- `fetch` is a service function (`services/**`), never an inline `r` call.
+
+```ts
+const dashboardSummaryResource = createAsyncResourceStore({
+  fetch: getDashboardSummary,
+  logPrefix: 'DASHBOARD_SUMMARY',
+});
+
+export const useDashboardSummary = () => dashboardSummaryResource.useResource();
+```

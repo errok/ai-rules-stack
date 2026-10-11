@@ -51,6 +51,7 @@ assets/            # Static resources
 ## Stores vs hooks
 - **Stores** (`stores/`): shared state + synchronous setters only — **never** import `services/**` or fetch inside a store (see **Zustand stores** rule under `store-rules/`).
 - **Hooks** (`hooks/`): orchestration — call services, then update stores via setters.
+- **Module stores** (`utils/moduleStore/`): data shared by components only while one is mounted; the resource's `fetch` is the thunk — see the module store rule under `store-rules/`.
 
 ## Auth
 - Contract: `TAuthService` in `services/auth/authTypes.ts`

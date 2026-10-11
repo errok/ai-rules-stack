@@ -48,6 +48,7 @@ theme / types / utils: transversal
 ## Layers
 - **Stores** (`stores/`): shared state + synchronous setters only — never services or fetch.
 - **Hooks** (`hooks/`): orchestration — call services, then update stores via setters.
+- **Module stores** (`utils/moduleStore/`): data shared by components only while one is mounted; the resource's `fetch` is the thunk — see the module store rule under `store-rules/`.
 - **HTTP**: authenticated calls through `r`, public ones through `rPublic` (`utils/fetch.ts`) — never raw `fetch()`.
 - **Auth**: never import a concrete provider — always go through `services/auth/index.ts` (`TAuthService`).
 
