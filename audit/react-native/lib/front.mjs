@@ -9,7 +9,7 @@ import ts from 'typescript';
 import { readFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
-const EXCLUDED_DIRS = new Set(['node_modules', 'android', 'ios', 'sub-modules', 'scripts', 'tools', 'docs']);
+const EXCLUDED_DIRS = new Set(['node_modules', 'android', 'ios', 'sub-modules', 'scripts', 'tools', 'docs', 'tmp']);
 const FETCH_FILE = 'utils/fetch.ts';
 const HTTP_CLIENTS = new Set(['r', 'rPublic']);
 
