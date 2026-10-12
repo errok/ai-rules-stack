@@ -26,7 +26,7 @@ Related: **Design tokens & Tailwind** (`ui-rules/`), **Naming** (core), **Compon
 primitives → semantic → component token → Ds*
 ```
 
-- **Never** hardcode hex/rgb in components or component token files.
+- **Never** hardcode hex/rgb in components or component token files. Depiction colors are the exception: the hex stays in the non-DS component token — see **Design tokens and Tailwind**.
 - **Never** import `design-tokens/primitives/*` from a `Ds*` component — only from token modules.
 - Component token file references **`sl.*`** (semantic) only — not primitives.
 

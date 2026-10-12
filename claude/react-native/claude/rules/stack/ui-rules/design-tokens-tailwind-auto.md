@@ -52,7 +52,9 @@ Primitive and semantic names are **generic on purpose** — `primary`, `secondar
 ## Usage
 
 - **`Ds*`:** never use semantic or `colors.js` Tailwind color classes (`bg-light-background-default`, `text-light-foreground-muted`, …). Freeze the component; restyle only via its token module (`style`).
-- **Screens / non-DS:** prefer `colors.js` utility classes over primitives or raw hex (blocklist blocks default Tailwind palettes).
+- **Screens / non-DS:** prefer `colors.js` utility classes over primitives (blocklist blocks default Tailwind palettes).
+- **Color values live only in `design-tokens/`:** never write a hex (`#fff`) or `rgb()` / `rgba()` anywhere else in the app — not in a style, a prop, an SVG stroke or an arbitrary class (`bg-[#fff]`). Use a theme class, or import the value from `design-tokens/` when a JS value is needed; add the token first if it is missing.
+- **Depiction colors stay in the component token.** A color that depicts a physical object (the paper of a target card) is not a primitive and not a semantic role: nothing else reuses it, and a rebrand must not move it. Write the hex in `design-tokens/components/{name}.js`. Do not add it to `primitives/colors.js` or `semantic/colors.js`. Themeable chrome still goes primitives → semantic → component.
 - **Gradients** only if wired in config (e.g. `theme.extend.gradient.light`).
 - **Alpha helpers:** `design-tokens/utils/withAlpha.js` when building transparent variants in token files.
 

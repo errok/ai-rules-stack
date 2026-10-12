@@ -18,7 +18,11 @@ const RULE = {
   picto: 'stack/ui-rules/picto-components-auto.md',
   svg: 'stack/ui-rules/svg-assets-auto.md',
   navigation: 'stack/stack-rules/react-navigation-auto.md',
+  tokens: 'stack/ui-rules/design-tokens-tailwind-auto.md',
 };
+
+/** A color written as a value: hex (`#fff`, `#ffffff`, `#ffffff80`) or `rgb(…)` / `rgba(…)`. */
+const COLOR = /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b|rgba?\(/;
 
 const tagName = (f, n) => (ts.isJsxElement(n) ? n.openingElement.tagName : n.tagName).getText(f.sf);
 
@@ -236,6 +240,31 @@ export const uiChecks = [
             out.push(p.finding(f, st, 'importe `react-native-modal` directement'));
           }
         }
+      }
+      return out;
+    },
+  },
+  {
+    id: 'F-DS-08',
+    rule: RULE.tokens,
+    sev: 'warn',
+    run: (p) => {
+      const out = [];
+      const app = (rel) =>
+        rel === 'App.tsx' ||
+        /^(screens|components|hooks|utils|navigation|stores|services|theme|config|modules|types)\//.test(rel);
+      for (const f of p.appUnder(app)) {
+        p.walk(f, (n) => {
+          let text = null;
+          if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) {
+            text = n.text;
+          } else if (ts.isTemplateExpression(n)) {
+            text = [n.head.text, ...n.templateSpans.map((s) => s.literal.text)].join('…');
+          }
+          if (text && COLOR.test(text) && !ts.isImportDeclaration(n.parent)) {
+            out.push(p.finding(f, n, `couleur en dur \`${text}\``));
+          }
+        });
       }
       return out;
     },

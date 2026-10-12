@@ -200,6 +200,13 @@ export const TEXTS = {
     why: 'ils appliquent déjà le thème et les réglages du projet.',
     fix: 'remplacer par l’équivalent `Ds*`.',
   },
+  'F-DS-08': {
+    title: 'Couleurs en dur dans l’app',
+    expected:
+      'une couleur (`#fff`, `rgb(…)`, `rgba(…)`) ne s’écrit que dans `design-tokens/` ; le reste de l’app passe par les tokens.',
+    why: 'une couleur écrite ailleurs échappe au thème et au design system : elle ne suit pas un changement de palette.',
+    fix: 'utiliser une classe Tailwind du thème, ou importer la valeur depuis `design-tokens/` (au besoin, y ajouter le token).',
+  },
   'F-PICTO-01': {
     title: 'Emplacement des pictogrammes',
     expected: 'les pictogrammes sont rangés dans `components/Picto/`.',

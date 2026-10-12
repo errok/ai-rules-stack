@@ -26,7 +26,7 @@ Related: **Design tokens & Tailwind** (`ui-rules/`), **Naming** (core), **Compon
 primitives → semantic → component token → Ds*
 ```
 
-- **Never** hardcode hex/rgb in components or component token files.
+- **Never** hardcode hex/rgb in components or component token files. Depiction colors are the exception: the hex stays in the non-DS component token — see **Design tokens and Tailwind**.
 - **Never** import `design-tokens/primitives/*` from a `Ds*` component — only from token modules.
 - Component token file references **`sl.*`** (semantic) only — not primitives.
 
@@ -100,7 +100,7 @@ To land `Ds*` + labs from a product branch onto stack `main`, use **`/promote-ds
 ## 7. Quick validation before PR
 
 - [ ] Component token → semantic → primitive chain intact
-- [ ] No hex in component or component token files
+- [ ] No hex in a Ds* component or its token (depiction colors stay in the non-DS component token — see the design-tokens rule)
 - [ ] Isolated `design-tokens/components/ds/{name}.js` or `ds/composed/{name}.js` (not duplicated in `colors.js`)
 - [ ] Barrel exports updated
 - [ ] DevDebugMenu entry + simulator works in `__DEV__`
