@@ -1,6 +1,8 @@
 /** Front ↔ Go back contract: the DTO / request comparison and the route gaps of `npm run api:map` / `api:dto`. */
-import { relative } from 'node:path';
+
 import { buildContract } from '../lib/contract.mjs';
+
+import { relative } from 'node:path';
 
 const RULE = 'stack/service-rules/api-contract.md';
 

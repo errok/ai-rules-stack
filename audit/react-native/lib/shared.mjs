@@ -1,9 +1,11 @@
 /** Loads the app and its Go back, links each front HTTP call to its back route, and holds the report helpers. */
+
+import { readBack, resolveBackDir, routeKey } from './back.mjs';
+import { buildCallGraph, loadFront, readHttpCall } from './front.mjs';
+
 import { execSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { basename, join, relative, resolve, sep } from 'node:path';
-import { readBack, resolveBackDir, routeKey } from './back.mjs';
-import { buildCallGraph, loadFront, readHttpCall } from './front.mjs';
 
 /** The app being audited: the working directory (make / npm run from the repo root), or AUDIT_ROOT. */
 export const FRONT_ROOT = resolve(process.env.AUDIT_ROOT ?? process.cwd());

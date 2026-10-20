@@ -1,10 +1,10 @@
 /** Checks on the UI layer: Tailwind classes, design system, SVG icons, navigation. */
 
+import { classAttributes, isComponentFile } from '../lib/engine.mjs';
 import ts from 'typescript';
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { classAttributes, isComponentFile } from '../lib/engine.mjs';
 
 const RULE = {
   architecture: 'stack/core-rules/project-architecture-always.md',

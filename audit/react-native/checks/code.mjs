@@ -1,10 +1,10 @@
 /** Checks on the code layers: services, stores, TypeScript, naming, component structure, dead code. */
 
+import { isComponentFile, isStackOwned } from '../lib/engine.mjs';
 import ts from 'typescript';
 
 import { readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { isComponentFile, isStackOwned } from '../lib/engine.mjs';
 
 const RULE = {
   architecture: 'stack/core-rules/project-architecture-always.md',

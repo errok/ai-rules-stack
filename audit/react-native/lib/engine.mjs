@@ -5,12 +5,12 @@
  * The output is in French, for the team.
  */
 
+import { APP_NAME, FRONT_ROOT } from './shared.mjs';
 import ts from 'typescript';
 
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
-import { APP_NAME, FRONT_ROOT } from './shared.mjs';
 
 export { APP_NAME, FRONT_ROOT };
 
