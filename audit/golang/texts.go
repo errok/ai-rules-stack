@@ -79,6 +79,12 @@ var checkTexts = map[string]checkText{
 		"même structure partout : on sait où chercher.",
 		"créer le fichier manquant et y déplacer le code concerné.",
 	},
+	"B-FILE-04": {
+		"Pas de fichier en plus dans un service",
+		"un service (dossier de `services/`, hors calcul pur et client d'API) n'a que ses trois fichiers : `<nom>.go`, `<nom>_domain.go` et `<nom>_mapper.go`. Une nouvelle fonctionnalité du même domaine va dans un sous-package `services/<nom>/<fonctionnalité>/`, avec ses propres trois fichiers.",
+		"sinon le domain et le mapper du service parent gonflent à chaque fonctionnalité, et on ne sait plus ce qui appartient à quoi.",
+		"créer `services/<nom>/<fonctionnalité>/` (`<fonctionnalité>.go`, `_domain.go`, `_mapper.go`), y déplacer le code ; le sous-package peut importer son parent pour les constantes et erreurs communes.",
+	},
 	"B-FILE-02": {
 		"Fichiers d'un contrôleur",
 		"chaque contrôleur v1 a un `<nom>_dto.go`, un `<nom>_mapper.go` et un `<nom>.go` (plus `<nom>_request.go` s'il lit une entrée).",

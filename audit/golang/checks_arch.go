@@ -251,6 +251,40 @@ func typeChecks() []check {
 			},
 		},
 		{
+			id: "B-FILE-04", rule: ruleServices, sev: sevWarn,
+			run: func(p *project) []finding {
+				var out []finding
+				for _, dir := range sortedDirs(p, "services/") {
+					if p.isPureDir(dir) || p.isClientDir(dir) {
+						continue
+					}
+					var mains, domains, mappers []*goFile
+					for _, f := range p.byDir[dir] {
+						switch {
+						case strings.HasSuffix(f.rel, "_test.go"):
+						case strings.HasSuffix(f.rel, "_domain.go"):
+							domains = append(domains, f)
+						case strings.HasSuffix(f.rel, "_mapper.go"):
+							mappers = append(mappers, f)
+						default:
+							mains = append(mains, f)
+						}
+					}
+					// One of each is the structure; every file past the first of its kind is a feature to move out.
+					for _, group := range [][]*goFile{mains, domains, mappers} {
+						for _, extra := range group[min(1, len(group)):] {
+							name := extra.rel[strings.LastIndex(extra.rel, "/")+1:]
+							out = append(out, finding{extra.rel, 0, fmt.Sprintf(
+								"`%s` est un fichier de plus dans `%s` : en faire un sous-package `%s/<fonctionnalité>/`",
+								name, dir, dir,
+							)})
+						}
+					}
+				}
+				return out
+			},
+		},
+		{
 			id: "B-FILE-02", rule: ruleAPI, sev: sevWarn,
 			run: func(p *project) []finding {
 				var out []finding
