@@ -1,0 +1,52 @@
+---
+name: Design tokens and Tailwind
+description: NativeWind tailwind.config primitives semantic component tokens typography blocklist gradients withAlpha design-tokens tailwind dirs.
+alwaysApply: false
+globs:
+  - "tailwind.config.js"
+  - "design-tokens/**"
+  - "tailwind/**"
+---
+# Design tokens and Tailwind
+
+## Token layers (do not skip)
+
+1. **Primitives** — raw values (palettes, numeric scales). Not for direct use in UI classes.
+   - Colors: `design-tokens/primitives/colors.js`
+   - Box shadows: `design-tokens/primitives/boxShadow.js` (when present)
+   - Typography scales / font face names: `design-tokens/primitives/typography.js` (must stay aligned with fonts loaded at **app bootstrap** / your font loader, e.g. Expo Google Fonts)
+
+2. **Semantic** — roles and intent (e.g. `action.default`, `foreground.muted`). Prefer these over primitives for theme consistency.
+   - Colors: `design-tokens/semantic/colors.js` (exports `{ light, dark }` — `dark` may be empty until themed)
+   - Typography tuples for the plugin / JS consumers: `design-tokens/semantic/typography.js` (when present)
+
+3. **Component** — map UI parts to semantic tokens (e.g. `button.primary.default.background`).
+   - **Shared Tailwind bridge (screens / non-DS only):** `design-tokens/components/colors.js` (`foreground`, `background`, `navigation`, …) — not per-component palettes
+   - **DS primitives:** `design-tokens/components/ds/{name}.js` (`button`, `card`, `container`, `icon`, …) — JS-only, consumed by `Ds*` via `style`
+   - **DS composed:** `design-tokens/components/ds/composed/{name}.js` (`modal`, `tabs`, `tile`, …) — same contract, mirrors `components/ds/composed`
+   - **Non-DS widgets:** `design-tokens/components/{name}.js` (`menu`, app-owned `halo`, …)
+   - Typography for `DsText`: `design-tokens/components/ds/typography.js`
+
+**Flow:** primitives → semantics → components. Rebrand by changing primitives; add dark mode by filling `dark` modules and wiring in `tailwind.config.js`.
+
+## `tailwind.config.js`
+
+- **Single entry** for NativeWind: requires token modules from `design-tokens/`, sets `theme.extend.colors.light` / `dark`, `boxShadow`, etc.
+- Keep the **file header comment** in sync when adding or renaming token files.
+- **Plugins:** only if present under `tailwind/plugins/` (e.g. typography) — do not assume they exist.
+- **Blocklist:** `tailwind/blocklist.js` — do not remove restrictions without team agreement (enforces tokens over default Tailwind palettes; disables `space-*` because NativeWind v4 native does not support it — use `gap-*` on flex parents).
+
+## Usage
+
+- **`Ds*`:** never use semantic or `colors.js` Tailwind color classes (`bg-light-background-default`, `text-light-foreground-muted`, …). Freeze the component; restyle only via its token module (`style`).
+- **Screens / non-DS:** prefer `colors.js` utility classes over primitives (blocklist blocks default Tailwind palettes).
+- **Color values live only in `design-tokens/`:** never write a hex (`#fff`) or `rgb()` / `rgba()` anywhere else in the app — not in a style, a prop, an SVG stroke or an arbitrary class (`bg-[#fff]`). Use a theme class, or import the value from `design-tokens/` when a JS value is needed; add the token first if it is missing.
+- **Depiction colors stay in the component token.** A color that depicts a physical object (the paper of a target card) is not a primitive and not a semantic role: nothing else reuses it, and a rebrand must not move it. Write the hex in `design-tokens/components/{name}.js`. Do not add it to `primitives/colors.js` or `semantic/colors.js`. Themeable chrome still goes primitives → semantic → component.
+- **Gradients** only if wired in config (e.g. `theme.extend.gradient.light`).
+- **Alpha helpers:** `design-tokens/utils/withAlpha.js` when building transparent variants in token files.
+
+## Related
+
+- Global stack and folders: **Project architecture** (core rules, always on)
+- **New `Ds*` component checklist:** `component-rules/ds-new-component-auto.mdc`
+- SVG / icon tinting: **SVG assets** under `ui-rules/`

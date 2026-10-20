@@ -1,0 +1,33 @@
+---
+name: Loading flags naming
+description: "Naming for loading booleans (is{Domain}Loading)"
+alwaysApply: false
+globs:
+  - "screens/**/*.ts"
+  - "screens/**/*.tsx"
+  - "components/**/*.ts"
+  - "components/**/*.tsx"
+  - "hooks/**/*.ts"
+  - "hooks/**/*.tsx"
+  - "stores/**/*.ts"
+---
+# Loading flags naming
+
+Use boolean flags that read well in JSX and describe **what is loading**, not **how**.
+
+- **Pattern**: `is{Domain}Loading`
+  - Domain = the thing being loaded (noun), singular/plural as appropriate.
+- **Avoid**: prefixes like `isFetching...` / suffixes like `...LoadingLoading`.
+
+## Examples
+
+```ts
+// ✅ GOOD
+const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+const [isFreeActivitiesLoading, setIsFreeActivitiesLoading] = useState(false);
+const [isCreateActivityLoading, setIsCreateActivityLoading] = useState(false);
+
+// ❌ BAD
+const [isFetchingCategoriesLoading, setIsFetchingCategoriesLoading] = useState(false);
+const [isFetchCategoriesLoading, setIsFetchCategoriesLoading] = useState(false);
+```

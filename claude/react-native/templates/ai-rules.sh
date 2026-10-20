@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# AI rules — wires the ai-rules-stack submodule into this project (Claude Code + Cursor).
+# AI rules — wires the ai-rules-stack submodule into this project (Claude Code + Cursor + Continue).
 #
 #   install  init the submodules, create / fix the stack symlinks, copy settings.json from the
 #            stack template when the project has none
@@ -38,6 +38,8 @@ LINKS=(
   ".cursor/rules/stack|$RULES/cursor/$STACK/cursor/rules/stack"
   ".cursor/commands|$RULES/cursor/$STACK/cursor/commands"
   ".cursorignore|$RULES/cursor/$STACK/cursorignore"
+  ".continue/rules/stack|$RULES/continue/$STACK/continue/rules/stack"
+  ".continue/prompts|$RULES/continue/$STACK/continue/prompts"
 )
 SETTINGS=".claude/settings.json"
 SETTINGS_TEMPLATE="$RULES/claude/$STACK/templates/settings.json"

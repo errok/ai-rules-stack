@@ -11,7 +11,7 @@
 #   link   create missing links, fix wrong ones, drop links whose common file is gone (default)
 #   check  report what `link` would change; exit 1 when something is out of date
 #   clean  remove every link that points into common/
-#   tool   claude, cursor, ... (the Makefile passes both by default)
+#   tool   claude, cursor, continue, ... (the Makefile passes all by default)
 
 set -euo pipefail
 

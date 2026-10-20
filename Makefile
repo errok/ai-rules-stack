@@ -1,6 +1,6 @@
 # Links every file of <tool>/common/ into <tool>/golang and <tool>/react-native.
 # TOOLS picks which tool folders to process, e.g. `make link TOOLS="claude cursor"`.
-TOOLS ?= claude cursor
+TOOLS ?= claude cursor continue
 
 .PHONY: help link check clean
 

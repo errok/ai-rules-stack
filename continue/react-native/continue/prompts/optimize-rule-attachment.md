@@ -1,0 +1,1 @@
+../../../common/prompts/optimize-rule-attachment.md
