@@ -36,6 +36,8 @@ If `docs/functional/` does not exist, say so and stop: creating the first docs i
    - `/** Rules: docs/functional/FR/06-clubs.md (CLUBAPP-FICHE-*); server rules in the API repo (CLUB-ROLE-*). */`
 
    Name the file and the identifier **prefixes**, not each identifier. Add the header to a touched file that has none, fix a stale one. Do not add headers to files that carry no rule.
+
+   If you format or lint, do it **on the files you touched only**, never on the whole repository: the project's formatter would also rewrite `sub-modules/` (the stack itself) and unrelated files. Check `git status` at the end: nothing outside `docs/` and the touched source files may have changed.
 5. **Check the references.** Every identifier cited in `docs/` or in a header exists; every domain file is cited by the README. List the broken ones.
 6. **Report**, short, as lists:
    - rules changed, added, removed;
