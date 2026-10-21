@@ -1,6 +1,6 @@
 ---
 name: "Hooks vs thunks — shared data (`utils/moduleStore`)"
-description: "Hooks vs thunks — hooks serve the UI, thunks (resource fetch / ensureLoaded / refetch) fill shared state; utils/moduleStore createModuleStore + createAsyncResourceStore, released when the last subscriber unmounts."
+description: "\"Hooks vs thunks — hooks serve the UI, thunks (resource fetch / ensureLoaded / refetch) fill shared state; utils/moduleStore createModuleStore + createAsyncResourceStore, released when the last subscriber unmounts.\""
 alwaysApply: false
 globs:
   - "hooks/**"

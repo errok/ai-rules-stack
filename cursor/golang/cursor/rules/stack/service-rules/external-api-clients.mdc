@@ -1,5 +1,4 @@
 ---
-title: External API Clients (non-DB services)
 description: services external HTTP client PostJSON DefaultClient sync.Once context AttachBearer authctx logging; not pure subpackages.
 globs: services/**/client.go,services/**/authctx.go,services/**/http_client.go
 alwaysApply: false
@@ -34,16 +33,14 @@ Some code under `services/` is not business logic backed by GORM. It is an **ext
 - Controllers should **not** instantiate external clients directly (avoid `NewClient()` in controllers).
 
 ## HTTP client
+- `NewClient()` / `DefaultClient()` must use `&http.Client{Timeout: …}` (e.g. **15s**) — never an unbounded client.
 - Prefer `*WithContext` methods so cancellation and bearer forwarding work.
-- `Timeout` is mandatory (non-zero, typically 15s, never `http.DefaultClient`) — contract in **Security & Middleware**.
 
 ## Bearer forwarding (internal services only)
-- Use `AttachBearer(ctx, rawToken)` in `authctx.go` with a **private** context key type.
-- Trust boundary (internal services only, never a third-party SaaS): **Security & Middleware**.
+- `AttachBearer(ctx, rawToken)` in `authctx.go` — trust-boundary constraints in `security-rules/security-auto.mdc`.
 
 ## Logging
-- Log outbound **request bodies at DEBUG only** — payloads may contain PII; never INFO-log full JSON bodies.
-- Which logger (`SRCLogger` / `CTRLogger`): **Logging** rule.
+- Log outbound **request bodies at DEBUG only** — payloads may contain PII; never INFO log full JSON bodies.
 
 ## Context
 - Accept `context.Context` on endpoint methods and pass it through `http.NewRequestWithContext`.

@@ -1,3 +1,10 @@
+---
+name: commit
+description: >-
+  Split the working tree into focused Conventional Commits (English),
+  safely. Use for /commit.
+---
+
 # Commit current changes
 
 Commit the current uncommitted work in this repository.
@@ -17,6 +24,7 @@ Commit the current uncommitted work in this repository.
 - Never push unless the user explicitly asks.
 - Do not commit secrets (`.env`, credentials, tokens, etc.). Warn and skip those files.
 - Never use interactive git flags (`-i`).
+- **Never** add an agent co-author trailer (`Co-authored-by: Cursor`, `Co-authored-by: Claude`, `Co-Authored-By: Claude …`, etc.) — no `--trailer Co-authored-by:…` for any assistant unless the user explicitly asks.
 
 ## Workflow
 

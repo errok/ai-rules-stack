@@ -1,6 +1,6 @@
 ---
 name: "Rules audit (`make audit`)"
-description: "make audit — stack audit (shared rules, from ai-rules-stack) then the app's project audit (its own rules); keep checks and rules in step, audit-ignore syntax."
+description: "\"make audit — stack audit (shared rules, from ai-rules-stack) then the app's project audit (its own rules); keep checks and rules in step, audit-ignore syntax.\""
 alwaysApply: false
 globs:
   - ".cursor/rules/**"

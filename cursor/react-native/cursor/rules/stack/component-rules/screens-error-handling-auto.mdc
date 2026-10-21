@@ -3,6 +3,7 @@ description: Screens (screens/) must own try/catch and user-facing error UX (no 
 globs: screens/**/*.tsx
 alwaysApply: false
 ---
+
 # Screens — Error handling (controllers)
 
 ## Principle

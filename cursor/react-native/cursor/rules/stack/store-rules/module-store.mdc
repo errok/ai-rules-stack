@@ -1,5 +1,5 @@
 ---
-description: Hooks vs thunks — hooks serve the UI, thunks (resource fetch / ensureLoaded / refetch) fill shared state; utils/moduleStore createModuleStore + createAsyncResourceStore, released when the last subscriber unmounts.
+description: "Hooks vs thunks — hooks serve the UI, thunks (resource fetch / ensureLoaded / refetch) fill shared state; utils/moduleStore createModuleStore + createAsyncResourceStore, released when the last subscriber unmounts."
 globs: hooks/**,**/hooks/**,stores/**,utils/moduleStore/**
 alwaysApply: false
 ---

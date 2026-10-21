@@ -3,8 +3,6 @@ name: "Modals — `DsModal` vs `DsModalFullScreen`"
 description: DsModal vs DsModalFullScreen EDsModalMode Center BottomSlide MODAL_MODE_CONFIG react-native-modal product dialogs screens.
 alwaysApply: false
 globs:
-  - "components/ds/composed/**/*.tsx"
-  - "components/ds/**/*Modal*.tsx"
   - "screens/**/*.tsx"
   - "components/**/*Modal*.tsx"
 ---

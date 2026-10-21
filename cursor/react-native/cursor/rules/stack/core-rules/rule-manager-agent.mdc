@@ -6,6 +6,9 @@ alwaysApply: false
 
 # Rule Manager
 
+Independent from the Claude rules (`.claude/`): a Cursor rule links only to other Cursor
+rules (`.mdc`), never to a Claude file (`.md`) — and the Claude rules never link here.
+
 ## File locations
 
 | Type | Location | Naming |
@@ -16,8 +19,9 @@ alwaysApply: false
 | Skill | `.cursor/skills/{name}/SKILL.md` | — |
 | Command | `.cursor/commands/{name}.md` | — |
 
-Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes.
-New rule files do **not** need a suffix. There is no `*-manual` type.
+- Stack rules come from the `ai-rules-stack` submodule: never edit them in a project — change them in `ai-rules-stack`, then `make update-rules` (`make install-rules` after cloning, `make check-rules` to verify).
+- Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes.
+- New rule files do **not** need a suffix. There is no `*-manual` type.
 
 ## Categories
 - `core-rules/` — agent behavior, architecture, global contracts
@@ -29,20 +33,17 @@ New rule files do **not** need a suffix. There is no `*-manual` type.
 - `auth-rules/` — auth provider
 - `stack-rules/` — navigation
 
-## Rules
-- Before creating a rule, check if an existing rule already covers the pattern
-- Keep rules concise — no redundancy between rule files
-- Always use English in rule content
+## Writing rules
+- Before creating a rule, check if an existing rule already covers the pattern. Never state the same guidance in two files that load together.
+- Always-on (`alwaysApply: true`) only for true repo-wide maps; everything else is scoped. Never add to `project-architecture-always` unless it is truly global.
+- Keep rules concise — English only, under ~250 lines per file; split a rule that mixes concerns.
+- Prefer adding new rule files over extending an always-apply rule.
 - After any creation or update, confirm: `✅ .cursor/rules/{path}/{file}.mdc created/updated`
-
-## Rule size guardrails
-- Keep each .mdc file under ~250 lines when possible
-- If a rule grows too large or mixes concerns, proactively propose splitting it into multiple focused rules
-- Prefer adding new rule files over extending the alwaysApply rule
 
 ## Globs vs descriptions (attachment)
 - **Auto-attached:** rules with `globs` that match the active file load automatically. Overly broad globs (e.g. `**/*.tsx` for every TSX file) inflate context on every screen edit.
 - **Prefer:** tight globs for **folder-specific** rules (`navigation/**`, `services/auth/**`, modal file paths). For **cross-cutting** conventions (icons, callbacks), scope globs to `components/**` when the same policy also holds for screens — rely on the **`description`** field so the agent can still pull the rule when editing `screens/**` or when the user @-mentions the topic.
 - **Descriptions:** Write keyword-rich one-liners (topics, folder names, symbols like `DsIcon`, `DsModal`) so agent-requested retrieval stays useful when globs are narrow.
 - **Screens:** Keep `component-screen-structure` (and similar) on `screens/**` where structure and navigation typing are screen-centric; avoid duplicating the same glob on every UI rule.
+- **`globs` YAML** — unquoted values: `globs: services/**`. Do not write `globs: "services/**"`.
 - **This repo has no `src/`** — use root folders (`screens/`, `components/`, `navigation/`, …).

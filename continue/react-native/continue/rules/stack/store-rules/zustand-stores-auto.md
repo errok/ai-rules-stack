@@ -1,6 +1,6 @@
 ---
 name: Zustand Stores — Conventions
-description: "Zustand stores/ — create(), T{Name}Store, MMKV persist mmkvStorage, partialize; no HTTP in stores; Supabase session not in Zustand."
+description: "\"Zustand stores/ — create(), T{Name}Store, MMKV persist mmkvStorage, partialize; no HTTP in stores; Supabase session not in Zustand.\""
 alwaysApply: false
 globs: "stores/**"
 ---
@@ -27,7 +27,7 @@ useMyStore.getState().setValue(response.field ?? null);
 ```
 
 ## Structure
-- One file per domain: `useUserStore.ts`, `useThemeStore.ts`
+- One file per domain: `userStore.ts`, `themeStore.ts`
 - State + setters in the same file using `create()` — no slices pattern
 - Actions are inline setter functions passed to `set`
 
@@ -46,9 +46,6 @@ useMyStore.getState().setValue(response.field ?? null);
 
 ## Logout / reset global
 - When adding or renaming a store that holds user-scoped state, **always** add a corresponding clear/reset call in `stores/utils/clearStores.ts` so logout clears all relevant stores consistently.
-
-## Naming
-Hook `use{Domain}Store`, file `use{Domain}Store.ts`, state type `T{Domain}Store` — prefixes are the **Naming** always-rule.
 
 ## Boolean UI flags (visibility, expanded, etc.)
 - Prefer **explicit intent** actions: `showMenu()` / `hideMenu()` (and optionally `toggleMenu()`).

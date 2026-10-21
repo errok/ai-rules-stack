@@ -1,6 +1,6 @@
 ---
 name: TypeScript Conventions
-description: "TypeScript strict type not interface import type no any Biome organizeImports legacy I* TSX screens components navigators."
+description: "\"TypeScript strict type not interface import type no any Biome organizeImports legacy I* TSX screens components navigators.\""
 alwaysApply: false
 globs:
   - "**/*.ts"
@@ -9,11 +9,16 @@ globs:
 # TypeScript Conventions
 
 ## Types vs interfaces
-- Always `type`, never `interface`, for data contracts (Biome `useConsistentTypeDefinitions`)
-- Prefixes and legacy `I*` (`T` / `Dto`, flag and offer a rename): **Naming** always-rule
+- Always use `type`, never `interface` for data contracts
+- Legacy `I*` type names: migrate to `T` / `Dto` per **Naming** (core rules, always on) — assistant should flag them when found.
+
+## Naming
+
+Full cheat sheet: **Naming** (core rules, always applied). Zustand details: **Zustand stores** rule under `store-rules/`.
 
 ## Forbidden patterns
 - No `any` — Biome warns, treat as error; use `unknown` + type guard
+- No `interface` for app data types — `type` only (Biome enforces `useConsistentTypeDefinitions`)
 - No `var` — use `const` or `let`
 - No raw `React.FC` — use explicit props type instead (see **Components & screens — structure** under `component-rules/`)
 - No unused imports — Biome enforces `noUnusedImports` as error

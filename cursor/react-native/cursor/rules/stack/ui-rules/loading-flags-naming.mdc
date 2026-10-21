@@ -1,6 +1,6 @@
 ---
-description: Naming for loading booleans (is{Domain}Loading)
-globs: screens/**/*.ts,screens/**/*.tsx,components/**/*.ts,components/**/*.tsx,hooks/**/*.ts,hooks/**/*.tsx,stores/**/*.ts
+description: "Naming for loading booleans — is{Domain}Loading, not isFetching / LoadingLoading. Applies to useState flags in screens, components, hooks, stores."
+globs: screens/**/*.tsx,components/**/*.tsx,hooks/**/*.ts,stores/**/*.ts
 alwaysApply: false
 ---
 

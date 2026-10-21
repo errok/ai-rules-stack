@@ -2,7 +2,7 @@
 name: "Picto components — `components/Picto/*`"
 description: Pictograms (pictos) as reusable UI components live under components/Picto; avoid ad-hoc copies; keep API simple (size/color/circle).
 alwaysApply: false
-globs: "components/Picto/**"
+globs: "components/**/*Picto*.tsx"
 ---
 # Picto components — `components/Picto/*`
 

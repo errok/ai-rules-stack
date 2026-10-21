@@ -4,7 +4,6 @@ globs: database/model/**/*.go
 alwaysApply: false
 ---
 
-
 # Database — GORM model associations
 
 Every foreign-key column `XxxID` has a matching association field of the same stem (without the `ID` suffix) pointing at the related model, so `Preload` / `Joins` work without extra wiring.

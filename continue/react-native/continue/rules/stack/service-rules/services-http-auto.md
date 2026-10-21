@@ -7,8 +7,7 @@ globs: "services/**"
 # Services — HTTP Layer Conventions
 
 ## HTTP client
-- Authenticated calls: `r` from `utils/fetch.ts`. Public (no JWT): `rPublic`. Never raw `fetch()`.
-- What `r` already does (token, platform headers, app version, 45s, `AbortSignal`, one 401 retry) is in the **Project architecture** always-rule — do not reimplement it in the service.
+- `r` adds the auth header, platform info, a 45s timeout, caller cancellation via `AbortSignal` and one retry after 401 — never re-implement any of it in a service.
 
 ## Error handling
 - **No try/catch in `services/**`**: let errors from `r()` bubble up.
@@ -33,9 +32,14 @@ const getUserMe = async (): Promise<MeDto> => {
 ```
 
 ## Typing
-- HTTP payloads use `…Dto` with the backend's exact type and JSON field names — **Naming** always-rule. No `T…` alias for a wire type.
-- No runtime validation (no Zod) — TypeScript types only.
-- Define DTOs in the service file or a co-located `*Types.ts` file.
+- No runtime validation (no Zod) — TypeScript types only for API responses
+- Define DTOs in the service file or a co-located `*Types.ts` file
+
+## DTO names — align with backend contracts
+- Mirror the **exact type names** and JSON field names from the target backend API.
+- Optional fields: reflect backend `omitempty` / optional semantics with `?` in TypeScript.
+- **Backend is source of truth** for wire contracts; update front service types when API DTOs change.
+- No ad-hoc front-only aliases for HTTP payloads.
 
 ## Endpoints
 - Prefer a stable `baseEndPoint` per domain and append the path in each function.
@@ -48,10 +52,6 @@ export const getMe = async (): Promise<MeDto> => {
   return await r<MeDto>({ url: baseEndPoint, method: 'GET' });
 };
 ```
-
-## Auth
-- Do not call `authService.getIdToken()` here — `r` already attaches it.
-- If a service must touch auth, import `services/auth/index.ts` only (never a concrete provider).
 
 ## File naming
 - `camelCase.ts` or domain folder (`api/me.ts`, `auth/index.ts`)

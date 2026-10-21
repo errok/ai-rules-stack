@@ -19,8 +19,9 @@ rules (`.mdc`), never to a Claude file (`.md`) — and the Claude rules never li
 | Skill | `.cursor/skills/{name}/SKILL.md` | — |
 | Command | `.cursor/commands/{name}.md` | — |
 
-Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes.
-New rule files do **not** need a suffix.
+- Stack rules come from the `ai-rules-stack` submodule: never edit them in a project — change them in `ai-rules-stack`, then `make update-rules` (`make install-rules` after cloning, `make check-rules` to verify).
+- Existing files keep their historical `*-auto` / `*-always` / `*-agent` suffixes.
+- New rule files do **not** need a suffix.
 
 ## Categories
 - `core-rules/` — architecture, global contracts, agent behavior
@@ -31,13 +32,13 @@ New rule files do **not** need a suffix.
 - `security-rules/` — auth, middleware, validation
 - `config-rules/` — env variables, configuration
 
-## Rules
-- Before creating a rule, check if an existing rule already covers the pattern
-- After changing architecture (router path, API version, DB model folder), **verify paths against the repo** — stale paths break agent guidance
-- Keep each .mdc file under ~250 lines — split if needed
-- Never add content to `project-architecture-always` unless it's truly global
+## Writing rules
+- Before creating a rule, check if an existing rule already covers the pattern. Never state the same guidance in two files that load together.
+- Always-on (`alwaysApply: true`) only for true repo-wide maps; everything else is scoped. Never add to `project-architecture-always` unless it is truly global.
+- After changing architecture (router path, API version, DB model folder), **verify globs against the repo** — stale paths break agent guidance.
+- Keep each `.mdc` file under ~250 lines — split if needed. English only.
 - After any creation or update: `✅ .cursor/rules/{path}/{file}.mdc created/updated`
-- All authored content under `.cursor/` must be **English** (chat summaries to the user may use French if the team prefers)
+- All authored content under `.cursor/` must be **English** (chat summaries to the user may use French if the team prefers).
 
 ## Globs vs descriptions (attachment)
 

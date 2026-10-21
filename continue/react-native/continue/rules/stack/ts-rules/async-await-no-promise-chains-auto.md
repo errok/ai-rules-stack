@@ -5,7 +5,6 @@ alwaysApply: false
 globs:
   - "hooks/**/*.ts"
   - "services/**/*.ts"
-  - "stores/**/*.ts"
   - "screens/**/*.tsx"
   - "components/**/*.tsx"
   - "utils/**/*.ts"

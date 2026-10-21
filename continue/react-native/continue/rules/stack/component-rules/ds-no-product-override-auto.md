@@ -1,12 +1,10 @@
 ---
 name: Product apps do not override the DS
-description: "Product apps never fork Ds* primitives or ds/composed — missing API goes to main via /promote-ds; product chrome lives in components/ not components/ds."
+description: "\"Product apps never fork Ds* primitives or ds/composed — missing API goes to main via /promote-ds; product chrome lives in components/ not components/ds.\""
 alwaysApply: false
 globs:
   - "components/ds/**"
-  - "components/ds/composed/**"
-  - "components/**/*.tsx"
-  - "design-tokens/components/**"
+  - "design-tokens/components/ds/**"
 ---
 # Product apps do not override the DS
 

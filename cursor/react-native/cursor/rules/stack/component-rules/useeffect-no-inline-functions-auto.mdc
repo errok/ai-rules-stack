@@ -3,6 +3,7 @@ description: useEffect no inline async anonymous function declare loader Init Ca
 globs: components/**/*.ts,components/**/*.tsx,screens/**/*.tsx
 alwaysApply: false
 ---
+
 # `useEffect` — no inline functions
 
 ## Rule

@@ -1,16 +1,16 @@
 ---
 name: audit
 description: >-
-  Run the release audit (stack rules of the Go backend; the app checks the
-  front ↔ back contract), list what to fix and ask which points to handle —
-  never change code before that answer. Use for /audit, make audit, or release audit.
+  Run the release audit (stack rules of the Go backend; the app checks
+  the front ↔ back contract), list what to fix and ask which points to
+  handle — never change code before that answer. Use for /audit.
 ---
 
 # `/audit` — release audit, then fixes the user picks
 
 ## Arguments
 
-- **(none)** — this repo + React Native app (`../<app>` for `<app>-back`) when present.
+- **(none)** — this repo + sibling React Native app when present.
 - **`local`** — this repo only; skip the app audit.
 
 ## 1. Run

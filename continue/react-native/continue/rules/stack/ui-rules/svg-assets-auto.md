@@ -1,6 +1,6 @@
 ---
 name: SVG assets
-description: "assets SVG icons — root svg color fallback black, stroke fill currentColor, tint from RN color prop; avoid duplicate white/black glyphs."
+description: "\"assets SVG icons — root svg color fallback black, stroke fill currentColor, tint from RN color prop; avoid duplicate white/black glyphs.\""
 alwaysApply: false
 globs: "assets/**/*.svg"
 ---

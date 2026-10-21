@@ -1,6 +1,6 @@
 ---
 name: Design tokens and Tailwind
-description: NativeWind tailwind.config primitives semantic component tokens typography blocklist gradients withAlpha design-tokens tailwind dirs.
+description: "\"NativeWind tailwind.config primitives semantic component tokens typography blocklist gradients withAlpha design-tokens tailwind dirs, rebrand, importing a design, generic token names, light/dark themes, reverse roles.\""
 alwaysApply: false
 globs:
   - "tailwind.config.js"
@@ -28,6 +28,20 @@ globs:
    - Typography for `DsText`: `design-tokens/components/ds/typography.js`
 
 **Flow:** primitives → semantics → components. Rebrand by changing primitives; add dark mode by filling `dark` modules and wiring in `tailwind.config.js`.
+
+## Token names are the contract
+
+Primitive and semantic names are **generic on purpose** — `primary`, `secondary`, `tertiary`, `neutral`, `alert`, `action.default`, `foreground.muted`. A name never references a hue, so a rebrand changes **values only** and no consumer moves.
+
+- **Rebranding / importing an external design** (Claude Design artifact, Figma export, screenshot): the project's primitives are **master**. Work out which incoming color maps onto which existing generic name and **replace its values**. Never import the design's own palette names (`steel`, `cyan`, …), and never add a parallel group to sidestep the remapping — a hue-named token forces a rename the day another color arrives.
+- **Exception:** font-family token names name a real font file, so swapping the font does rename them (`roboto` → `inter`, …). Type **scales** stay put: reuse the existing sizes, adjust one only if the design truly demands it.
+- A rebrand is **not finished at the primitive layer**. Re-read every component token module: a palette flip silently inverts any slot wired to `background.reverse` / `foreground.reverse` (card borders, menu labels, tile sheen), and washes out slots wired to an accent that changed hue. Resolve the modules in Node and compare the hex against the design before calling it done.
+
+## `light` / `dark` and the `reverse` roles
+
+- **`light` is the default theme whatever its luminosity** — if the product's design is dark, it lives in `light` all the same, and `dark` stays `{}`. A real second theme then costs nothing: move `light` into `dark`, author a new `light`, no consumer to touch.
+- **`*.reverse` is relative to the current theme**, not a fixed light or dark value: it means the inverse of the theme, for contrast. A contrasting panel takes `background.reverse` + `foreground.reverse`, so a component needs one key instead of one per theme.
+- On a **theme** surface use `default` / `muted`; on a deliberately inverted surface use the `reverse` pair. Surfaces of **fixed** luminosity (a full-bleed photo or camera preview, a hardcoded splash background) are not inverted surfaces — they follow whichever key matches their own luminosity, and therefore change key if the theme's luminosity flips.
 
 ## `tailwind.config.js`
 

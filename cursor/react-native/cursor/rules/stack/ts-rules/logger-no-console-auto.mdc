@@ -3,6 +3,7 @@ description: logger utils/logger react-native-logs console.log console.info cons
 globs: **/*.ts,**/*.tsx
 alwaysApply: false
 ---
+
 # Logs — always through `utils/logger`
 
 ## Rule

@@ -19,7 +19,9 @@ Use this when refactoring `.cursor/rules/` so **fewer rules load automatically**
    - Examples: **placeholder** names (`FeatureScreen`, `UserDto`, `EExampleRoutes`)—not real product modules.
    - **Cross-rules:** point by **intent / category** (“the **Naming** always-rule”, “the **modals** rule under `component-rules/`”), not by embedding another rule’s **filename** (`*-auto.mdc`).
 3. **Autonomous attachment** — if nobody should rely on manually attaching context, **do not leave `globs` empty** for rules that must govern everyday edits. Prefer the **smallest glob that still hits those files**; **some overlap** between rule files is acceptable if it keeps attachment automatic.
-4. **`alwaysApply: true`** only for true **repo-wide maps** (architecture + naming, etc.); widen rarely.
+4. **`alwaysApply: true`** only for true **repo-wide maps** (architecture + naming, etc.); widen rarely. The always-on set must stay **minimal** — everything else gets tight `globs`.
+5. **No duplication** — each piece of guidance lives in one file: the one whose `globs` best match where it applies. Files that load together must not restate each other.
+6. **Stack rules live in ai-rules-stack** — never edit submodule copies in an app; change the source repo, then `make update-rules`.
 
 ---
 

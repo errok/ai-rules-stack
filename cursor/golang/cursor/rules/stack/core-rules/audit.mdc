@@ -1,5 +1,5 @@
 ---
-description: make audit — stack audit of the Go backend (ai-rules-stack, own Go module), plus a project audit only when the backend has scriptable rules of its own; keep checks and rules in step, audit-ignore syntax.
+description: "make audit — stack audit of the Go backend (ai-rules-stack, own Go module), plus a project audit only when the backend has scriptable rules of its own; keep checks and rules in step, audit-ignore syntax."
 globs: .cursor/rules/**,scripts/audit/**,tmp/audit/**
 alwaysApply: false
 ---
