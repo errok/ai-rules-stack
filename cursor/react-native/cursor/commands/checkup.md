@@ -2,8 +2,8 @@
 name: checkup
 description: >-
   Release checkup: sync-doc, make audit (ask before fixes), expo install
-  --check + expo-doctor (ask), npm run check (ask), tests (ask), then biome
-  --write. Use for /checkup.
+  --check, ncu (ask, Expo-safe), expo-doctor (ask), npm run check (ask),
+  tests (ask), then biome --write. Use for /checkup.
 ---
 
 # `/checkup` — docs, audit, deps, check, tests, format
@@ -52,25 +52,54 @@ Do **not** start step 3 until the audit ask/fix/re-run cycle for this step is do
    change `package.json` / lockfile before the answer.**
 4. If the user declines or there is nothing to do, continue.
 
-## 4. Expo doctor
+## 4. npm-check-updates (`ncu`)
+
+Report outdated deps **before** doctor, so Expo SDK alignment (step 3) is already done.
+
+1. Run **report only** (never write yet): `npx npm-check-updates` (same as `ncu` without `-u`).
+2. If nothing is outdated, say so and go to step 5.
+3. Split the report in two lists for the user:
+   - **Expo / React Native stack — do not bump with ncu:** `expo`, `expo-*`, `@expo/*`,
+     `react-native`, `react`, `react-dom`, `@react-native/*`, and any package whose
+     version Expo pins for the current SDK. For those, the path is step 3
+     (`expo install` / `--fix`) or an intentional SDK upgrade — **never**
+     `ncu -u` / `ncu -u <expo-package>`.
+   - **Other deps (candidates):** everything else (navigation, zustand, biome,
+     supabase client, etc.).
+4. **Advise before asking.** From the candidates, give a short recommendation:
+   what to bump **now**, what to **defer**, and **why** for each (risk: patch/minor
+   vs major; NativeWind/Tailwind coupling; TypeScript major; breaking peers;
+   changelog known-breakers; “safe tooling” like Biome). Be opinionated — do not
+   dump the raw ncu list and wait. Prefer patch/minor; flag majors as a dedicated
+   job unless the user already asked for them.
+5. Ask with **AskQuestion** (`allow_multiple: true`) which of the **recommended
+   (and optionally deferred)** packages to update. **Do not** run `ncu -u` /
+   rewrite `package.json` before the answer.
+6. For each picked package: bump only that one (e.g. `npx npm-check-updates -u <pkg>`
+   then `npm install`, or `npm install <pkg>@<target>`). Re-run `npx npm-check-updates`
+   and show what remains.
+7. If the user picks nothing or declines, continue with the leftover list noted in
+   the final report.
+
+## 5. Expo doctor
 
 1. Run `npx expo-doctor` at the app root.
-2. If everything is OK, say so and go to step 5.
+2. If everything is OK, say so and go to step 6.
 3. Otherwise: short report of the findings. Ask with **AskQuestion** which
    issues to handle now. Fix only what was picked (deps, config, peer ranges,
    etc.). Re-run `npx expo-doctor` and show before → after.
 4. If the user picks nothing, continue with remaining findings noted in the final report.
 
-## 5. `npm run check` (Biome CI + TypeScript)
+## 6. `npm run check` (Biome CI + TypeScript)
 
 1. Run `npm run check` (`biome ci . && tsc --noEmit`).
-2. If exit 0: say so and go to step 6.
+2. If exit 0: say so and go to step 7.
 3. Otherwise: split the failures (Biome vs `tsc`), list them (file, line, message),
    propose a short fix plan, ask with **AskQuestion** which to fix now. Fix only
    what was picked. Re-run `npm run check` and show before → after.
 4. If the user picks nothing, continue with remaining errors noted in the final report.
 
-## 6. Tests
+## 7. Tests
 
 1. Detect how to run tests, in this order:
    - `npm test` / `npm run test` if defined in `package.json`
@@ -83,7 +112,7 @@ Do **not** start step 3 until the audit ask/fix/re-run cycle for this step is do
    tests; show before → after.
 4. If the user picks nothing, continue with remaining failures noted in the final report.
 
-## 7. Biome write
+## 8. Biome write
 
 Run `npm run fix` (`biome check --write .`) at the app root.
 
@@ -92,13 +121,14 @@ Run `npm run fix` (`biome check --write .`) at the app root.
   ask whether to fix them.
 - Never format under `sub-modules/`.
 
-## 8. Final report
+## 9. Final report
 
 One short summary:
 
 - sync-doc: done / skipped / stopped (why); doubts left if any
 - audit: counts still not OK; what was fixed vs left aside
 - expo install --check: aligned / skipped / declined
+- ncu: advice given; nothing outdated / updated (list) / declined (leftovers)
 - expo-doctor: clean / remaining / declined
 - npm run check: clean / remaining errors
 - tests: clean / skipped (no suite) / remaining failures
