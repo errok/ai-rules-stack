@@ -34,6 +34,7 @@ const GROUPS = {
   EFFECT: 'Structure des composants',
   CB: 'Structure des composants',
   STYLE: 'Structure des composants',
+  LOG: 'Logs',
   COMMENT: 'Ménage',
   DEAD: 'Ménage',
   TW: 'Espacements (Tailwind)',

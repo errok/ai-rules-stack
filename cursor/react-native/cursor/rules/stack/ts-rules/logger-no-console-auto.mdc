@@ -1,0 +1,32 @@
+---
+description: logger utils/logger react-native-logs console.log console.info console.error forbidden channels LOGGER_CONFIG createLogger helpers logAuth logApi debug menu Logs lab.
+globs: **/*.ts,**/*.tsx
+alwaysApply: false
+---
+# Logs — always through `utils/logger`
+
+## Rule
+- App code never calls `console.*` (`log`, `info`, `warn`, `error`, `debug`…). It writes through `utils/logger.ts`:
+  a channel logger (`authLogger`, `apiLogger`…), a helper when a message repeats (`logAuth.login`,
+  `logApi.request`…), or `loggerInstance` for a one-off without a channel.
+- `utils/logger.ts` is the only file that reaches the console, through react-native-logs (`consoleTransport`).
+- Node scripts under `scripts/` are command-line tools, not app code: they keep `console` / `process.stdout`.
+
+## Why
+- One place decides what prints: a level per channel in `LOGGER_CONFIG` (`debug`, `info`, or `false` to silence
+  it), everything in dev, errors only in release, with the channel's colour and the time. `console` bypasses all of it
+  and prints in release too.
+
+## A message without a channel
+- Add the channel to `utils/logger.ts`: its level in `LOGGER_CONFIG`, its colour in `extensionColors`, then
+  `export const {name}Logger = createLogger('NAME')`, and helpers (`log{Name}.…`) when the same message comes back.
+- Give it a card in the debug menu's Logs lab (`components/_devDebugMenu/DebugLogs.tsx`), which writes through every
+  channel and says where each call lands.
+
+## Audit
+- `F-LOG-01` (error): a `console.*` call outside `utils/logger.ts`.
+- Unused channels and helpers of `utils/logger.ts` are not reported by `F-DEAD-01`: the stack ships them for the
+  app to use as it grows.
+
+## Related
+- Biome's `noConsole` only warns, and allows `info` / `warn` / `error`: the audit is what enforces this rule.

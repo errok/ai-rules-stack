@@ -131,6 +131,15 @@ export const TEXTS = {
     fix: 'remplacer l’objet par les classes équivalentes (`w-12`, `absolute left-0`…).',
   },
 
+  // Logs
+  'F-LOG-01': {
+    title: 'console au lieu du logger',
+    expected:
+      'l’app écrit ses logs avec `utils/logger` (un logger de canal comme `apiLogger`, un helper comme `logAuth.login`, ou `loggerInstance`), jamais avec `console.*`.',
+    why: 'le logger décide de ce qui s’affiche (niveau par canal dans `LOGGER_CONFIG`, tout en dev, erreurs seules en release) ; `console` passe outre et s’affiche aussi en release.',
+    fix: 'remplacer l’appel par le logger du canal concerné ; s’il n’existe pas, ajouter le canal dans `utils/logger.ts`.',
+  },
+
   // Housekeeping
   'F-COMMENT-01': {
     title: 'Code commenté',

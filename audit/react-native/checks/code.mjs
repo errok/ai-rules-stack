@@ -19,6 +19,7 @@ const RULE = {
   effects: 'stack/component-rules/useeffect-no-inline-functions-auto.md',
   callbacks: 'stack/component-rules/handle-callback-prefix-auto.md',
   loading: 'stack/ui-rules/loading-flags-naming.md',
+  logger: 'stack/ts-rules/logger-no-console-auto.md',
 };
 
 const SECTIONS = [
@@ -38,6 +39,8 @@ const SECTIONS = [
 ];
 const OPTIONAL_SECTIONS = new Set(['No data']);
 const BANNER = /^\s*\/\/ -------- (.+?) --------/;
+/** The one file that writes to the console, through react-native-logs. */
+const LOGGER_FILE = 'utils/logger.ts';
 
 const isFunctionLike = (node) => node && (ts.isArrowFunction(node) || ts.isFunctionExpression(node));
 
@@ -523,6 +526,25 @@ export const codeChecks = [
     },
   },
   {
+    id: 'F-LOG-01',
+    rule: RULE.logger,
+    sev: 'error',
+    run: (p) => {
+      const out = [];
+      for (const f of p.files) {
+        if (f.rel === LOGGER_FILE) {
+          continue;
+        }
+        p.walk(f, (n) => {
+          if (ts.isPropertyAccessExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === 'console') {
+            out.push(p.finding(f, n, `\`console.${n.name.text}\` au lieu du logger`));
+          }
+        });
+      }
+      return out;
+    },
+  },
+  {
     id: 'F-COMMENT-01',
     rule: RULE.structure,
     sev: 'warn',
@@ -558,9 +580,11 @@ export const codeChecks = [
         if (indegree.get(node.id) || node.name === '<module>' || roots.test(file) || !/\.tsx?$/.test(file)) {
           continue;
         }
-        // Stack-owned code, and the stack keys / redirect enums every `{section}.types.ts` declares by convention.
+        // Stack-owned code, the logger's channels and helpers (shipped for the app to use as it grows), and the
+        // stack keys / redirect enums every `{section}.types.ts` declares by convention.
         if (
           isStackOwned(file) ||
+          file === LOGGER_FILE ||
           (/^navigation\/.*\.types\.ts$/.test(file) && /^E\w*Stack(Redirect)?$/.test(node.name))
         ) {
           continue;
