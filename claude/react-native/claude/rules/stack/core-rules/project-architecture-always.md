@@ -34,7 +34,7 @@ hooks/             # Custom hooks (data, UI logic, heavy processing)
 theme/             # Visual tokens / navigation theme helpers
 types/             # Cross-cutting TS types
 utils/             # Utility functions
-config/            # Environment, Supabase, Figma
+config/            # Environment, Supabase
 i18n/              # Localization
 assets/            # Static resources
 design-tokens/     # Token modules: primitives → semantic → component (mirrors components/ds/)

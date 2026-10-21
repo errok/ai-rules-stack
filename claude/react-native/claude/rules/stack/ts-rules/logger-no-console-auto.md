@@ -31,4 +31,5 @@ paths:
   app to use as it grows.
 
 ## Related
-- Biome's `noConsole` only warns, and allows `info` / `warn` / `error`: the audit is what enforces this rule.
+- Biome: `noConsole` is an error in the app's `biome.json`, off only for `scripts/**`, so the editor flags a call as
+  it is typed; the audit (`F-LOG-01`) reports any left.
