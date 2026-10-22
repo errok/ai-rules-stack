@@ -8,3 +8,4 @@ rules (`.md`), never to Cursor files (`.mdc`).
 @.claude/rules/stack/core-rules/project-architecture-always.md
 @.claude/rules/stack/core-rules/naming-auto.md
 @.claude/rules/stack/core-rules/no-unrequested-cleanup-always.md
+@.claude/rules/stack/core-rules/database-schemas-always.md

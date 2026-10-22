@@ -40,6 +40,7 @@ Each service lives in `services/<name>/` (nested domains use subfolders) with th
 - **Services should load full domain**: do not shape DB `SELECT` clauses to match a specific controller DTO. Load `table.*` (plus optional enriched/join fields) so the same service method can be reused by other controllers; controllers decide the projection.
 - **Prefer high-level GORM APIs**: use `Model(&T{})`, `Where`, `Preload`, relations, and typed structs.
   - Avoid `Table(...)`, raw `Select(...)`, and hand-written `Joins(...)` unless there is no other reasonable way (perf, complex aggregation).
+  - **Never write a table name in a query** — it comes from the model (`TableName()`), or from `database.TableOf(db, &model.X{})` in a `Raw`; see `core-rules/database-queries-always.mdc`.
   - If ordering/filtering needs data from a preloaded relation and would force a custom join, prefer sorting/filtering **in Go** for simple lists.
 - **Mapper owns domain list assembly**: when converting DB models to **domain slices** (`[]Domain`) and applying domain-level ordering, put the loop + sorting into `*_mapper.go` (e.g. `toDomainList(...)`). Services should just fetch models and call the mapper.
 

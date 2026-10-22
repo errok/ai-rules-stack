@@ -25,9 +25,10 @@ description: Go module at repo root; Model Service Controller; gin router middle
 │   └── v1/                # Versioned API handlers (e.g. v1/me/)
 ├── services/              # Business logic — domain models, mappers, GORM / external APIs
 ├── database/
-│   ├── model/             # GORM table mirrors (incl. model/i18n/ when needed)
+│   ├── model/<schema>/    # GORM table mirrors, one folder per schema (never public)
+│   ├── tables/<schema>/   # One DDL file per table
 │   ├── db.go              # DB connection singleton
-│   └── init.sql           # Initial schema script (manual migrations)
+│   └── init.sql           # Schemas, grants and the \i order of the table files
 ├── router/
 │   └── router.go          # Route registration
 ├── middleware/            # Auth, user provisioning, context, body limit, etc.

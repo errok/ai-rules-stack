@@ -1,0 +1,1 @@
+../../../../../common/rules/stack/core-rules/database-schemas-always.md

@@ -6,4 +6,6 @@ belong to the project (`.claude/rules/project/`). Claude rules link only to Clau
 (`.md`), never to Cursor files (`.mdc`).
 
 @.claude/rules/stack/core-rules/project-architecture-always.md
+@.claude/rules/stack/core-rules/database-schemas-always.md
+@.claude/rules/stack/core-rules/database-queries-always.md
 @.claude/rules/stack/core-rules/no-go-test-auto.md

@@ -1,6 +1,6 @@
 ---
-description: GORM table mirrors database/model database/db.go Init connection RunInTx FromContext transaction in context; entity files GORM tags no JSON; init.sql for schema bootstrap.
-globs: database/db.go,database/model/**/*.go
+description: "GORM table mirrors database/model/<schema> database/db.go Init connection RunInTx FromContext transaction in context; every table in a named schema, never public; DDL database/tables/<schema>; no table name written in a query, TableOf; init.sql for schema bootstrap."
+globs: database/db.go,database/model/**/*.go,database/tables/**/*.sql,database/init.sql
 alwaysApply: false
 ---
 
@@ -8,11 +8,12 @@ alwaysApply: false
 
 ## DB models (`database/model/`)
 - Mirror of DB tables — one file per entity (`user.go`, `order.go`)
-- **PostgreSQL schema `public` (default)** — models live at the **root** of `database/model/`; `TableName()` is the bare table name (e.g. `"users"`).
-- **Any other schema** — one subfolder per schema name under `database/model/<schema>/`:
+- **Every table lives in a named schema — never `public`** (always-on: `core-rules/database-schemas-always.mdc` and `database-queries-always.mdc`; audit `B-DB-09` / `B-DB-10`).
+- One subfolder per schema under `database/model/<schema>/`:
   - Example: tables in schema **`i18n`** → `database/model/i18n/notification_type.go`
   - Go package name = folder name: `package i18n` (import `…/database/model/i18n`)
-  - `TableName()` must stay **schema-qualified**: `"i18n.notification_type"`, etc.
+  - `TableName()` is **schema-qualified**: `"i18n.notification_type"`, etc.
+- Go packages cannot import each other: keep foreign keys **one-way** between schemas (e.g. `target` → `session`). A relation that would close a loop cannot be an association field; leave it out and say why with `// audit-ignore B-DB-01: …` on the FK column.
 - GORM tags only — never JSON annotations (models are not returned to the client as API contracts)
 - FK associations: each `XxxID` has a matching relation field — see `gorm-model-associations.mdc`
 - Naming: structs `PascalCase`, fields `PascalCase`, tables/columns `snake_case`
@@ -47,6 +48,15 @@ type Account struct {
 - SQL trace is enabled when the **DB** log perimeter is `DEBUG` (`LOG_DB_LEVEL` or `LOG_LEVEL`); see `LOGGING.md`
 - Set appropriate timeouts on DB operations where relevant
 
+## Queries — never write a table name
+- Same always-on rule (`core-rules/database-queries-always.mdc`, audit `B-DB-08`). `database.TableOf(db, &model.X{})` lives in `database/db.go`:
+
+```go
+func TableOf(db *gorm.DB, value any) clause.Table // the table of a model, for a `?` of a Raw
+```
+
 ## Schema bootstrap
-- Initial schema via `database/init.sql` (idempotent SQL script)
+- Initial schema via `database/init.sql` (idempotent SQL script): `CREATE SCHEMA IF NOT EXISTS`, then `GRANT USAGE` and `ALTER DEFAULT PRIVILEGES` for the roles the backend and Supabase use, then the `\i` of every table file in foreign-key order
+- One file per table: `database/tables/<schema>/<table>.sql`, `CREATE TABLE IF NOT EXISTS <schema>.<table>` — folder, qualifier and model folder agree
+- Moving tables of a populated database: `ALTER TABLE … SET SCHEMA …` (indexes, constraints, foreign keys, sequences, triggers and RLS follow; grants and the body of functions do not — check them). Expose a schema in the Supabase API settings only if the REST API reads it
 - No AutoMigrate in production — migrations are managed explicitly

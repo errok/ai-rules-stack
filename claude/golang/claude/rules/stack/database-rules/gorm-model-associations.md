@@ -19,7 +19,7 @@ Owner   *User     `gorm:"foreignKey:OwnerID;references:ID"`
 ## Rules
 
 - Use pointer association fields (`*OrderType`) so unloaded relations stay `nil`.
-- Add useful inverse sides when needed (has-one / has-many), e.g. `User.Orders []Order` with `foreignKey:OwnerID`.
+- Add useful inverse sides when needed (has-one / has-many), unless the two models live in schemas that would then import each other, e.g. `User.Orders []Order` with `foreignKey:OwnerID`.
 - Do not model associations to tables outside the app schema with no local Go type (e.g. `auth.users` under Supabase Auth).
 - Non-SQL links (encrypted refs, opaque tokens) are **not** foreign keys → no GORM association.
 - Keep `database/model/*.go` free of explanatory comments — SQL + these rules are enough.
