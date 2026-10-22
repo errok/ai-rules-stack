@@ -12,13 +12,20 @@ The docs are written **in the language of the existing docs**, from the code, ne
 
 - `docs/functional/<LANG>/README.md`: summary table of the files, with the identifier prefix of each domain.
 - `docs/functional/<LANG>/NN-domain.md`: the rules of one domain. Each rule has a stable identifier (`PREFIX-TOPIC-NN`), a statement, its edge cases, and its reason when it is not obvious.
-- `docs/functional/.last-sync`: one commit hash, the last commit whose changes the docs describe.
+- `docs/.last-sync.json`: where each kind of doc was last synced, one entry per kind. This command reads and writes only `functional.commit`, the last commit whose changes `docs/functional/` describes. Any other entry (`designSystem`: its `url` and `commit`) belongs to another sync: keep it as it is.
+
+```json
+{
+  "functional": { "commit": "<40-character hash>" },
+  "designSystem": { "url": "<artifact url>", "commit": "<40-character hash>" }
+}
+```
 
 If `docs/functional/` does not exist, say so and stop: creating the first docs is a separate job.
 
 ## Anchor
 
-- `.last-sync` missing, or not a commit of this repository: say so and stop. Do not guess a starting point.
+- `docs/.last-sync.json` missing, without `functional.commit`, or with a hash that is not a commit of this repository: say so and stop. Do not guess a starting point.
 - The hash is not an ancestor of `HEAD` (rewritten history): say so and stop.
 
 ## Steps
@@ -44,7 +51,7 @@ If `docs/functional/` does not exist, say so and stop: creating the first docs i
    - headers added or fixed;
    - **doubts**: a behavior you could not tie to a rule, a rule you could not tell was still true, a change that contradicts a rule. Ask, do not decide;
    - uncommitted changes that will need a sync later.
-7. **Move the anchor** only when the doubts are settled: write the hash of the last commit you read (`HEAD` at the start of the run) into `docs/functional/.last-sync`. Leave the diff for the user to review; do not commit.
+7. **Move the anchor** only when the doubts are settled: write the hash of the last commit you read (`HEAD` at the start of the run) into `functional.commit` of `docs/.last-sync.json`, the other entries untouched. Leave the diff for the user to review; do not commit.
 
 ## Never
 

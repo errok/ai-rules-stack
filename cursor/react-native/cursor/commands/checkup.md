@@ -26,7 +26,7 @@ reports and questions. Never commit or push.
 ## 1. Sync functional docs (`/sync-doc`)
 
 Follow **exactly** the `/sync-doc` command (same steps, same Never list): bring
-`docs/functional/` up to date with commits since `.last-sync`, fix rule headers,
+`docs/functional/` up to date with commits since `functional.commit` in `docs/.last-sync.json`, fix rule headers,
 report, settle doubts, move the anchor only when doubts are settled.
 
 If sync-doc must **stop** (no docs folder, bad anchor, rewritten history), report
