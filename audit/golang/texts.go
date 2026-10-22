@@ -142,6 +142,25 @@ var checkTexts = map[string]checkText{
 		"retirer `.Debug()`.",
 	},
 
+	"B-DB-08": {
+		"Noms de tables dans les requêtes",
+		"aucune requête n'écrit le nom d'une table : le nom ne vit que dans le `TableName()` du modèle ; une requête passe par le modèle (`Model`, `Joins` d'association, struct de conditions) ou, pour un SQL que GORM ne sait pas construire, par `database.TableOf(db, &model.X{})`.",
+		"un nom de table écrit à la main n'est pas suivi par un changement de schéma ou de nom, et la requête casse à l'exécution.",
+		"remplacer par le modèle (`Model(&model.X{})`, relation `Joins(\"Xxx\")`, `Where(&model.X{…})`) ; pour un `Raw`, donner la table avec `?` et `database.TableOf(db, &model.X{})`.",
+	},
+	"B-DB-09": {
+		"Modèles hors de public",
+		"chaque modèle déclare une table d'un schéma nommé (`TableName()` = `<schéma>.<table>`) et vit dans `database/model/<schéma>/` ; aucune table n'est dans `public`.",
+		"le schéma sépare les responsabilités de la base ; `public` n'est qu'un fourre-tout qu'on ne doit pas laisser grossir.",
+		"choisir le schéma de la table, le mettre dans `TableName()` et déplacer le modèle dans `database/model/<schéma>/`.",
+	},
+	"B-DB-10": {
+		"Tables SQL hors de public",
+		"chaque `CREATE TABLE` de `database/tables/` est qualifié par un schéma nommé (jamais `public`) et le fichier est dans `database/tables/<schéma>/`.",
+		"le DDL est la source du schéma : il doit montrer où vit chaque table.",
+		"écrire `CREATE TABLE <schéma>.<table>`, créer le schéma dans `init.sql` s'il manque, et ranger le fichier dans `database/tables/<schéma>/`.",
+	},
+
 	// API
 	"B-API-01": {
 		"Détails d'erreur renvoyés sur une 500",
