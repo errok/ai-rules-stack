@@ -1,5 +1,5 @@
 ---
-description: "docs/.last-sync.json schema — one top-level entry per kind of sync (functional, designSystem, jira), each owned by one command that never touches the others."
+description: "docs/.last-sync.json schema — one top-level entry per kind of sync (functional, designSystem, designs, jira), each owned by one command that never touches the others."
 globs: docs/.last-sync.json
 alwaysApply: false
 ---
@@ -12,12 +12,14 @@ One file per repo, one top-level entry per kind of sync. Each entry has a single
 |---|---|---|---|
 | `functional` | `commit` | `/sync-doc` | Last commit whose changes `docs/functional/` describes |
 | `designSystem` | `url`, `commit` | `/sync-design-system` | Design-system artifact, and the last code commit it reflects (front only) |
+| `designs` | list of `name`, `url` | none — set by hand | The Claude Design projects or files the screens come from (several allowed); read-only for every command, shown as links by the doc viewer |
 | `jira` | `url`, `project` | none — set by hand | The product's Jira project: browse URL and project key; read-only for every command |
 
 ```json
 {
   "functional": { "commit": "<sha>" },
   "designSystem": { "url": "https://claude.ai/artifact/<id>", "commit": "<sha>" },
+  "designs": [{ "name": "<screen or flow>", "url": "https://claude.ai/design/p/<id>?file=<file>" }],
   "jira": { "url": "https://<site>.atlassian.net/browse/<KEY>", "project": "<KEY>" }
 }
 ```
