@@ -1,0 +1,1 @@
+../../../../../common/rules/stack/core-rules/last-sync.md
